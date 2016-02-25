@@ -1,6 +1,7 @@
 {
     "name": "AnrDaemon/library",
     "description": "Published classes from private library",
+    "license": "WTFPL",
     "require": {
         "php": ">=5.3.0"
     },

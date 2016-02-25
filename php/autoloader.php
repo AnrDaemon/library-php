@@ -8,6 +8,10 @@ namespace AnrDaemon;
 
 function spl_autoload($className)
 {
+  // Absolutely minimal "AnrDaemon\?" class name
+  if(strlen($className) < 11)
+    return false;
+
   $file = new \SplFileInfo(__DIR__ . substr(strtr("$className.php", '\\', '/'), 9));
   $path = $file->getRealPath();
   if(empty($path))

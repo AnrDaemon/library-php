@@ -3,7 +3,7 @@
     "description": "Published classes from private library",
     "license": "WTFPL",
     "require": {
-        "php": ">=5.3.0"
+        "php": "^5.3.6"
     },
     "autoload": {
         "psr-4": {

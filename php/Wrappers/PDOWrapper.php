@@ -2,14 +2,20 @@
 /** PDO chaining wrapper and syntactic sugar.
 *
 * @package Wrappers
-* @version SVN: $Id: PDOWrapper.php 491 2016-02-24 12:58:51Z anrdaemon $
+* @version SVN: $Id: PDOWrapper.php 532 2016-07-19 13:28:58Z anrdaemon $
 */
 
 namespace AnrDaemon\Wrappers;
 
-class PDOWrapper extends \PDO
+use PDO;
+
+class PDOWrapper extends PDO
 {
   /** PDO::__construct() wrapper with some necessary stuff.
+  *
+  * Forces PDO::ERRMODE_EXCEPTION.
+  * Defaults to PDO::FETCH_ASSOC.
+  * Fixes pdo_mysql not honouring charset=... in DSN  in PHP < 5.3.6.
   *
   * @param string $dsn
   * @param string $username
@@ -22,17 +28,17 @@ class PDOWrapper extends \PDO
   public function __construct($dsn, $username = null, $password = null, $options = array())
   {
     // Force exceptions over return codes.
-    $options[\PDO::ATTR_ERRMODE] = \PDO::ERRMODE_EXCEPTION;
+    $options[PDO::ATTR_ERRMODE] = PDO::ERRMODE_EXCEPTION;
 
     // Set default fetch mode to PDO::FETCH_ASSOC if nothing else is specified.
-    if(!isset($options[\PDO::ATTR_DEFAULT_FETCH_MODE]))
-      $options[\PDO::ATTR_DEFAULT_FETCH_MODE] = \PDO::FETCH_ASSOC;
+    if(!isset($options[PDO::ATTR_DEFAULT_FETCH_MODE]))
+      $options[PDO::ATTR_DEFAULT_FETCH_MODE] = PDO::FETCH_ASSOC;
 
     // Hack for PHP < 5.3.6 not honoring charset= in DSN.
     // Keep in mind this is NOT entirely safe for ethereal character sets.
     // But it is fairly fine for UTF-8 and most of western single-byte encodings.
     if(version_compare(PHP_VERSION, '5.3.6', '<') && preg_match('/^mysql:.*\bcharset=(?P<charset>\w+)/i', trim($dsn), $ta))
-      $options[\PDO::MYSQL_ATTR_INIT_COMMAND] = "SET NAMES {$ta['charset']}";
+      $options[PDO::MYSQL_ATTR_INIT_COMMAND] = "SET NAMES {$ta['charset']}";
 
     parent::__construct($dsn, $username, $password, $options);
   }

@@ -1,15 +1,27 @@
 ------------------------------------------------------------------------
-r532 | anrdaemon | 2016-07-19 16:28:58 +0300 (Вт, 19 июл 2016) | 3 lines
+r602 | anrdaemon | 2016-07-20 04:07:22 +0300 (Ср, 20 июл 2016) | 12 lines
 
-* use over FQNS.
-* More clear __construct() override description.
+# Misc\Coordinate3D
+* Class renamed to a shorter (and more sensible) name.
+* Import used class names into local space.
+- Removed bogus ::fromGPS() fabric. It IS a "GPS" coordinate class, already...
+  What more?
+- Renamed ::fromVector() fabric to ::fromPolar() as a more appropriate name.
++ Improved ::format() to allow both raw printing and custom formatting.
+- Made ::__set() to not throw exception on success.
+- Overall make methods more conformant to future language improvements.
++ ::__debugInfo();
++ Simplified ArrayAccess assignment.
++ Some comments.
 
 ------------------------------------------------------------------------
-r531 | anrdaemon | 2016-07-18 21:48:46 +0300 (Пн, 18 июл 2016) | 2 lines
+r601 | anrdaemon | 2016-07-20 02:48:26 +0300 (Ср, 20 июл 2016) | 2 lines
 
-* Removed svn:externals. FFS.
++ Import coordinate class from SoH lib.
 
 ------------------------------------------------------------------------
-r530 | anrdaemon | 2016-07-18 21:42:58 +0300 (Пн, 18 июл 2016) | 2 lines
+r533 | anrdaemon | 2016-07-19 23:05:21 +0300 (Вт, 19 июл 2016) | 2 lines
 
-* Universal stackable classloader.
++ Fix classloader for good.
+
+------------------------------------------------------------------------

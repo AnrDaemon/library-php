@@ -1,7 +1,7 @@
 <?php
 /** Base GPS coordinates class
 *
-* @version SVN: $Id: Coordinate3D.php 602 2016-07-20 01:07:22Z anrdaemon $
+* @version SVN: $Id: Coordinate3D.php 609 2016-07-27 01:33:09Z anrdaemon $
 */
 
 namespace AnrDaemon\Misc;
@@ -48,25 +48,41 @@ class Coordinate3D
 
   /** Distance between two coordinates.
   *
-  * @param Coordinate3D $target the point to calculate distance to
+  * @param Coordinate3D|int $target|$x the point to calculate distance to
+  * @param ?int $y the point to calculate distance to
+  * @param ?int $z the point to calculate distance to
   * @return float distance
   */
-  public function distance(Coordinate3D $target)
+  public function distance($target, $y = null, $z = null)
   {
-    $_x = $this->gps['x'] - $target->gps['x'];
-    $_y = $this->gps['y'] - $target->gps['y'];
-    $_z = $this->gps['z'] - $target->gps['z'];
+    if($target instanceof self)
+    {
+      $_x = $this->gps['x'] - $target->gps['x'];
+      $_y = $this->gps['y'] - $target->gps['y'];
+      $_z = $this->gps['z'] - $target->gps['z'];
+    }
+    else
+    {
+      $_x = $this->gps['x'] - $target;
+      $_y = $this->gps['y'] - $y;
+      $_z = $this->gps['z'] - $z;
+    }
     return sqrt($_x*$_x + $_y*$_y + $_z*$_z);
   }
 
   /** Translate coordinate in space
   *
-  * @param Coordinate3D $shift the distances by which a coordinate must be translated.
+  * @param Coordinate3D|int $shift|$x the distances by which a coordinate must be translated.
+  * @param ?int $y the distances by which a coordinate must be translated.
+  * @param ?int $z the distances by which a coordinate must be translated.
   * @return Coordinate3D the translated coordinate
   */
-  public function translate(Coordinate3D $shift)
+  public function translate($shift, $y = null, $z = null)
   {
-    return new static($this->gps['x'] + $shift->x, $this->gps['y'] + $shift->y, $this->gps['z'] + $shift->z);
+    if($shift instanceof self)
+      return new static($this->gps['x'] + $shift->gps['x'], $this->gps['y'] + $shift->gps['y'], $this->gps['z'] + $shift->gps['z']);
+    else
+      return new static($this->gps['x'] + $shift, $this->gps['y'] + $y, $this->gps['z'] + $z);
   }
 
   public function format($format = null, $decimals = null, $thousands = null)
@@ -126,7 +142,7 @@ class Coordinate3D
     return array('gps' => $this->gps, 'precision' => $this->precision);
   }
 
-  // \ArrayAccess implementation for coordinates.
+// \ArrayAccess implementation for coordinates.
 
   public function offsetExists($offset)
   {

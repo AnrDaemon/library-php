@@ -2,7 +2,7 @@
 /** PDO chaining wrapper and syntactic sugar.
 *
 * @package Wrappers
-* @version SVN: $Id: PDOWrapper.php 532 2016-07-19 13:28:58Z anrdaemon $
+* @version SVN: $Id: PDOWrapper.php 603 2016-07-21 00:35:48Z anrdaemon $
 */
 
 namespace AnrDaemon\Wrappers;
@@ -36,7 +36,7 @@ class PDOWrapper extends PDO
 
     // Hack for PHP < 5.3.6 not honoring charset= in DSN.
     // Keep in mind this is NOT entirely safe for ethereal character sets.
-    // But it is fairly fine for UTF-8 and most of western single-byte encodings.
+    // But it is fairly fine for UTF-8 and compatible single-byte encodings.
     if(version_compare(PHP_VERSION, '5.3.6', '<') && preg_match('/^mysql:.*\bcharset=(?P<charset>\w+)/i', trim($dsn), $ta))
       $options[PDO::MYSQL_ATTR_INIT_COMMAND] = "SET NAMES {$ta['charset']}";
 
@@ -77,7 +77,7 @@ class PDOWrapper extends PDO
   *
   * @param string SQL query with placeholders.
   * @param array substitution variables.
-  * @return mixed first column of the first row of the resultset.
+  * @return mixed[] first row of the resultset.
   *
   * @see PDO::prepare()
   * @see PDOStatement::execute()
@@ -92,22 +92,23 @@ class PDOWrapper extends PDO
   *
   * @param string SQL query with placeholders.
   * @param array substitution variables.
-  * @return mixed first column of the first row of the resultset.
+  * @param int column number to retrieve value from.
+  * @return mixed value of the $column_number's column from the first row of the resultset.
   *
   * @see PDO::prepare()
   * @see PDOStatement::execute()
   * @see PDOStatement::fetchColumn()
   */
-  public function getColumn($query, $arguments = array())
+  public function getColumn($query, $arguments = array(), $column_number = 0)
   {
-    return $this->run($query, $arguments)->fetchColumn();
+    return $this->run($query, $arguments)->fetchColumn($column_number);
   }
 
   /** PDO::prepare()::execute()::fetchAll() chaining wrapper.
   *
   * @param string SQL query with placeholders.
   * @param array substitution variables.
-  * @return mixed first row of the resultset.
+  * @return array the entire resultset as an array.
   *
   * @see PDO::prepare()
   * @see PDOStatement::execute()

@@ -2,7 +2,7 @@
 /** PDO chaining wrapper and syntactic sugar.
 *
 * @package Wrappers
-* @version SVN: $Id: PDOWrapper.php 603 2016-07-21 00:35:48Z anrdaemon $
+* @version SVN: $Id: PDOWrapper.php 618 2016-12-02 19:14:56Z anrdaemon $
 */
 
 namespace AnrDaemon\Wrappers;
@@ -29,6 +29,10 @@ class PDOWrapper extends PDO
   {
     // Force exceptions over return codes.
     $options[PDO::ATTR_ERRMODE] = PDO::ERRMODE_EXCEPTION;
+
+    // Disables emulated prepares if not told otherwise
+    if(!isset($options[PDO::ATTR_EMULATE_PREPARES]))
+      $options[PDO::ATTR_EMULATE_PREPARES] = false;
 
     // Set default fetch mode to PDO::FETCH_ASSOC if nothing else is specified.
     if(!isset($options[PDO::ATTR_DEFAULT_FETCH_MODE]))

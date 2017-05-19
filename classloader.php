@@ -1,26 +1,22 @@
 <?php
 /** Universal stackable classloader.
 *
-* @version SVN: $Id: classloader.php 619 2016-12-02 19:15:47Z anrdaemon $
+* @version SVN: $Id: classloader.php 632 2017-05-19 13:40:51Z anrdaemon $
 */
 
 namespace AnrDaemon;
 
 use SplFileInfo;
 
-$JeQa5VZ1eB13zrb1 = strlen(__NAMESPACE__);
-
-spl_autoload_register(function($className) use($JeQa5VZ1eB13zrb1)
+spl_autoload_register(function($className)
 {
-  if(strncasecmp($className, __NAMESPACE__ . '\\', $JeQa5VZ1eB13zrb1 + 1) !== 0)
+  if(strstr($className, '\\', true) !== __NAMESPACE__)
     return;
 
-  $file = new SplFileInfo(__DIR__ . strtr(substr("$className.php", $JeQa5VZ1eB13zrb1), '\\', '/'));
+  $file = new SplFileInfo(__DIR__ . strtr(strstr("$className.php", '\\'), '\\', '/'));
   $path = $file->getRealPath();
   if(!empty($path))
   {
     include_once $path;
   }
 });
-
-unset($JeQa5VZ1eB13zrb1);

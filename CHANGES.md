@@ -1,18 +1,18 @@
 ------------------------------------------------------------------------
-r620 | anrdaemon | 2016-12-13 01:23:54 +0300 (Вт, 13 дек 2016) | 4 lines
+r634 | anrdaemon | 2017-05-22 16:27:59 +0300 (Пн, 22 май 2017) | 3 lines
 
-+ Initial implementation of enhanced SQLite wrapper.
-  + regexp()
-  + utf8_general_ci collation. (C_x_CI_AI)
-
-------------------------------------------------------------------------
-r617 | anrdaemon | 2016-12-02 21:01:37 +0300 (Пт, 02 дек 2016) | 2 lines
-
-+ Disable emulated prepares by default.
+* Tweak timezone regexp to a simpler set of rules.
++ Add SQL query to check for matching/missing timezones.
 
 ------------------------------------------------------------------------
-r610 | anrdaemon | 2016-07-30 21:41:52 +0300 (Сб, 30 июл 2016) | 2 lines
+r633 | anrdaemon | 2017-05-22 10:49:37 +0300 (Пн, 22 май 2017) | 3 lines
 
-+ Patch classloader for better universality.
+* New MYSQL_INIT_COMMAND wrapper.
++ timezone= variable for connection.
+
+------------------------------------------------------------------------
+r632 | anrdaemon | 2017-05-19 16:40:51 +0300 (Пт, 19 май 2017) | 2 lines
+
+* Remove external vars from classloader.
 
 ------------------------------------------------------------------------

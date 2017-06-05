@@ -1,18 +1,16 @@
 ------------------------------------------------------------------------
-r634 | anrdaemon | 2017-05-22 16:27:59 +0300 (Пн, 22 май 2017) | 3 lines
+r653 | anrdaemon | 2017-06-06 02:02:17 +0300 (Вт, 06 июн 2017) | 2 lines
 
-* Tweak timezone regexp to a simpler set of rules.
-+ Add SQL query to check for matching/missing timezones.
-
-------------------------------------------------------------------------
-r633 | anrdaemon | 2017-05-22 10:49:37 +0300 (Пн, 22 май 2017) | 3 lines
-
-* New MYSQL_INIT_COMMAND wrapper.
-+ timezone= variable for connection.
+* Split MySQL specific code into a separate class.
 
 ------------------------------------------------------------------------
-r632 | anrdaemon | 2017-05-19 16:40:51 +0300 (Пт, 19 май 2017) | 2 lines
+r645 | anrdaemon | 2017-05-30 17:48:03 +0300 (Вт, 30 май 2017) | 2 lines
 
-* Remove external vars from classloader.
+- Remove encoding from language spec of LC_TIME.
+
+------------------------------------------------------------------------
+r644 | anrdaemon | 2017-05-30 01:03:51 +0300 (Вт, 30 май 2017) | 2 lines
+
++ lc_time support for PDO wrapper.
 
 ------------------------------------------------------------------------

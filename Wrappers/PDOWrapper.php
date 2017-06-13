@@ -2,12 +2,12 @@
 /** PDO chaining wrapper and syntactic sugar.
 *
 * @package Wrappers
-* @version SVN: $Id: PDOWrapper.php 658 2017-06-13 15:05:30Z anrdaemon $
+* @version SVN: $Id: PDOWrapper.php 659 2017-06-13 15:49:42Z anrdaemon $
 */
 
 namespace AnrDaemon\Wrappers;
 
-use PDO;
+use PDO, Exception, ErrorException;
 
 class PDOWrapper extends PDO
 {

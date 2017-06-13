@@ -2,7 +2,7 @@
 /** PDO chaining wrapper and syntactic sugar.
 *
 * @package Wrappers
-* @version SVN: $Id: PDOWrapper.php 653 2017-06-05 23:02:17Z anrdaemon $
+* @version SVN: $Id: PDOWrapper.php 658 2017-06-13 15:05:30Z anrdaemon $
 */
 
 namespace AnrDaemon\Wrappers;
@@ -38,7 +38,17 @@ class PDOWrapper extends PDO
     if(!isset($options[PDO::ATTR_DEFAULT_FETCH_MODE]))
       $options[PDO::ATTR_DEFAULT_FETCH_MODE] = PDO::FETCH_ASSOC;
 
-    parent::__construct($dsn, $username, $password, $options);
+    try
+    {
+      set_error_handler(function($s, $m, $f, $l, $c = null) { throw new ErrorException($m, 0, $s, $f, $l); });
+      parent::__construct($dsn, $username, $password, $options);
+      restore_error_handler();
+    }
+    catch(Exception $e)
+    {
+      restore_error_handler();
+      throw $e;
+    }
   }
 
   /** PDO::setAttribute() chaining wrapper.

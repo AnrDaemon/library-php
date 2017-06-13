@@ -1,16 +1,7 @@
 ------------------------------------------------------------------------
-r653 | anrdaemon | 2017-06-06 02:02:17 +0300 (Вт, 06 июн 2017) | 2 lines
+r658 | anrdaemon | 2017-06-13 18:05:30 +0300 (Вт, 13 июн 2017) | 3 lines
 
-* Split MySQL specific code into a separate class.
-
-------------------------------------------------------------------------
-r645 | anrdaemon | 2017-05-30 17:48:03 +0300 (Вт, 30 май 2017) | 2 lines
-
-- Remove encoding from language spec of LC_TIME.
-
-------------------------------------------------------------------------
-r644 | anrdaemon | 2017-05-30 01:03:51 +0300 (Вт, 30 май 2017) | 2 lines
-
-+ lc_time support for PDO wrapper.
+* Force convert all errors to exceptions for connection phase.
+  PDO will attach them as PDOException::previous.
 
 ------------------------------------------------------------------------

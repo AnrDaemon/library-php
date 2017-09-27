@@ -122,8 +122,8 @@ class PDOWrapper extends PDO
   * @see PDOStatement::execute()
   * @see PDOStatement::fetchAll()
   */
-  public function getAll($query, $arguments = array())
+  public function getAll($query, $arguments = array(), $fetch_style = PDO::FETCH_ASSOC,  $fetch_argument = null, $ctor_args = array())
   {
-    return $this->run($query, $arguments)->fetchAll();
+    return $this->run($query, $arguments)->fetchAll($fetch_style);
   }
 }

@@ -2,7 +2,7 @@
 /** PDO chaining wrapper and syntactic sugar.
 *
 * @package Wrappers
-* @version SVN: $Id: PDOWrapper.php 682 2017-09-29 00:42:27Z anrdaemon $
+* @version SVN: $Id: PDOWrapper.php 683 2017-09-29 01:06:21Z anrdaemon $
 */
 
 namespace AnrDaemon\Wrappers;
@@ -25,7 +25,7 @@ class PDOWrapper extends PDO
   *
   * @see PDO::__construct()
   */
-  public function __construct($dsn, $username = null, $password = null, $options = array())
+  public function __construct($dsn, $username = null, $password = null, array $options = array())
   {
     // Force exceptions over return codes.
     $options[PDO::ATTR_ERRMODE] = PDO::ERRMODE_EXCEPTION;
@@ -74,7 +74,7 @@ class PDOWrapper extends PDO
   * @see PDO::prepare()
   * @see PDOStatement::execute()
   */
-  public function run($query, $arguments = array())
+  public function run($query, array $arguments = array())
   {
     $stmt = $this->prepare($query);
     $stmt->execute($arguments);
@@ -91,13 +91,13 @@ class PDOWrapper extends PDO
   * @see PDOStatement::execute()
   * @see PDOStatement::fetch()
   */
-  public function get($query, $arguments = array())
+  public function get($query, array $arguments = array())
   {
     $args = func_get_args();
     array_shift($args);
     array_shift($args);
 
-    return call_user_func_array([$this->run($query, $arguments), 'fetch'], $args);
+    return call_user_func_array(array($this->run($query, $arguments), 'fetch'), $args);
   }
 
   /** PDO::prepare()::execute()::fetchColumn() chaining wrapper.
@@ -111,7 +111,7 @@ class PDOWrapper extends PDO
   * @see PDOStatement::execute()
   * @see PDOStatement::fetchColumn()
   */
-  public function getColumn($query, $arguments = array(), $column_number = 0)
+  public function getColumn($query, array $arguments = array(), $column_number = 0)
   {
     return $this->run($query, $arguments)->fetchColumn($column_number);
   }
@@ -126,12 +126,12 @@ class PDOWrapper extends PDO
   * @see PDOStatement::execute()
   * @see PDOStatement::fetchAll()
   */
-  public function getAll($query, $arguments = array())
+  public function getAll($query, array $arguments = array())
   {
     $args = func_get_args();
     array_shift($args);
     array_shift($args);
 
-    return call_user_func_array([$this->run($query, $arguments), 'fetchAll'], $args);
+    return call_user_func_array(array($this->run($query, $arguments), 'fetchAll'), $args);
   }
 }

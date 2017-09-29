@@ -2,7 +2,7 @@
 /** PDO SQLite enhancement wrapper
 *
 * @package Wrappers
-* @version SVN: $Id: PDOSqlite.php 620 2016-12-12 22:23:54Z anrdaemon $
+* @version SVN: $Id: PDOSqlite.php 683 2017-09-29 01:06:21Z anrdaemon $
 */
 
 namespace AnrDaemon\Wrappers;
@@ -22,7 +22,7 @@ class PDOSqlite extends PDOWrapper
   * @see PDO::__construct()
   * @see AnrDaemon\Wrappers\PDO::__construct()
   */
-  public function __construct($dsn, $username = null, $password = null, $options = array())
+  public function __construct($dsn, $username = null, $password = null, array $options = array())
   {
     parent::__construct($dsn, $username, $password, $options);
 

@@ -2,7 +2,7 @@
 /** PDOWrapper for MySQL with extensions.
 *
 * @package Wrappers
-* @version SVN: $Id: PDOMysql.php 653 2017-06-05 23:02:17Z anrdaemon $
+* @version SVN: $Id: PDOMysql.php 683 2017-09-29 01:06:21Z anrdaemon $
 */
 
 namespace AnrDaemon\Wrappers;
@@ -25,7 +25,7 @@ class PDOMysql extends PDOWrapper
   *
   * @see PDO::__construct()
   */
-  public function __construct($dsn, $username = null, $password = null, $options = array())
+  public function __construct($dsn, $username = null, $password = null, array $options = array())
   {
     // Hack for PHP < 5.3.6 not honoring charset= in DSN.
     // Keep in mind this is NOT entirely safe for ethereal character sets.

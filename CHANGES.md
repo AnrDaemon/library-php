@@ -1,4 +1,10 @@
 ------------------------------------------------------------------------
+r683 | anrdaemon | 2017-09-29 04:06:21 +0300 (Пт, 29 сен 2017) | 3 lines
+
+- Fix PHP 5.3 compatibility.
+* Typehint array parameters.
+
+------------------------------------------------------------------------
 r682 | anrdaemon | 2017-09-29 03:42:27 +0300 (Пт, 29 сен 2017) | 2 lines
 
 + Implement PDOStatement::fetch/fetchAll extra parameters.

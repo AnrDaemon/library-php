@@ -1,7 +1,16 @@
 ------------------------------------------------------------------------
-r658 | anrdaemon | 2017-06-13 18:05:30 +0300 (Вт, 13 июн 2017) | 3 lines
+r682 | anrdaemon | 2017-09-29 03:42:27 +0300 (Пт, 29 сен 2017) | 2 lines
 
-* Force convert all errors to exceptions for connection phase.
-  PDO will attach them as PDOException::previous.
++ Implement PDOStatement::fetch/fetchAll extra parameters.
+
+------------------------------------------------------------------------
+r680 | anrdaemon | 2017-09-05 17:05:40 +0300 (Вт, 05 сен 2017) | 2 lines
+
++ Misc\Url (Unreleased yet.)
+
+------------------------------------------------------------------------
+r659 | anrdaemon | 2017-06-13 18:49:42 +0300 (Вт, 13 июн 2017) | 2 lines
+
+Fix class resolution.
 
 ------------------------------------------------------------------------

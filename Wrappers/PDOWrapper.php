@@ -2,7 +2,7 @@
 /** PDO chaining wrapper and syntactic sugar.
 *
 * @package Wrappers
-* @version SVN: $Id: PDOWrapper.php 659 2017-06-13 15:49:42Z anrdaemon $
+* @version SVN: $Id: PDOWrapper.php 682 2017-09-29 00:42:27Z anrdaemon $
 */
 
 namespace AnrDaemon\Wrappers;
@@ -93,7 +93,11 @@ class PDOWrapper extends PDO
   */
   public function get($query, $arguments = array())
   {
-    return $this->run($query, $arguments)->fetch();
+    $args = func_get_args();
+    array_shift($args);
+    array_shift($args);
+
+    return call_user_func_array([$this->run($query, $arguments), 'fetch'], $args);
   }
 
   /** PDO::prepare()::execute()::fetchColumn() chaining wrapper.
@@ -124,6 +128,10 @@ class PDOWrapper extends PDO
   */
   public function getAll($query, $arguments = array())
   {
-    return $this->run($query, $arguments)->fetchAll();
+    $args = func_get_args();
+    array_shift($args);
+    array_shift($args);
+
+    return call_user_func_array([$this->run($query, $arguments), 'fetchAll'], $args);
   }
 }

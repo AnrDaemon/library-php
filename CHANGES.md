@@ -1,22 +1,50 @@
 ------------------------------------------------------------------------
-r683 | anrdaemon | 2017-09-29 04:06:21 +0300 (Пт, 29 сен 2017) | 3 lines
+r694 | anrdaemon | 2017-10-29 19:44:16 +0300 (Вс, 29 окт 2017) | 2 lines
 
-- Fix PHP 5.3 compatibility.
-* Typehint array parameters.
++ Url: ArrayAccess,Iterator,Countable for query parameters.
 
 ------------------------------------------------------------------------
-r682 | anrdaemon | 2017-09-29 03:42:27 +0300 (Пт, 29 сен 2017) | 2 lines
+r693 | anrdaemon | 2017-10-29 04:29:58 +0300 (Вс, 29 окт 2017) | 2 lines
 
-+ Implement PDOStatement::fetch/fetchAll extra parameters.
+* Normalize query array.
+
+------------------------------------------------------------------------
+r690 | anrdaemon | 2017-10-22 22:56:42 +0300 (Вс, 22 окт 2017) | 4 lines
+
+* Handle initial values more gracefully.
+* Always decode query string.
+* Remove unused class properties.
+
+------------------------------------------------------------------------
+r689 | anrdaemon | 2017-10-20 01:06:24 +0300 (Пт, 20 окт 2017) | 2 lines
+
+* Fix key merging.
+
+------------------------------------------------------------------------
+r688 | anrdaemon | 2017-10-20 00:48:42 +0300 (Пт, 20 окт 2017) | 2 lines
+
+* Improve rendering of all parts.
+
+------------------------------------------------------------------------
+r687 | anrdaemon | 2017-10-20 00:32:39 +0300 (Пт, 20 окт 2017) | 3 lines
+
+* Improve query part rendering.
+* Improve fragment part rendering.
+
+------------------------------------------------------------------------
+r686 | anrdaemon | 2017-10-16 02:15:13 +0300 (Пн, 16 окт 2017) | 2 lines
+
++ Allow isset() on Url parts.
+
+------------------------------------------------------------------------
+r685 | anrdaemon | 2017-10-15 21:50:02 +0300 (Вс, 15 окт 2017) | 3 lines
+
+* Decode path when parsing URL.
+  Leaving %2F encoded.
 
 ------------------------------------------------------------------------
 r680 | anrdaemon | 2017-09-05 17:05:40 +0300 (Вт, 05 сен 2017) | 2 lines
 
-+ Misc\Url (Unreleased yet.)
-
-------------------------------------------------------------------------
-r659 | anrdaemon | 2017-06-13 18:49:42 +0300 (Вт, 13 июн 2017) | 2 lines
-
-Fix class resolution.
++ Misc\Url
 
 ------------------------------------------------------------------------

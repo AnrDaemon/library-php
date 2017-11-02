@@ -1,50 +1,20 @@
 ------------------------------------------------------------------------
-r694 | anrdaemon | 2017-10-29 19:44:16 +0300 (Вс, 29 окт 2017) | 2 lines
+r697 | anrdaemon | 2017-11-01 20:05:47 +0300 (Ср, 01 ноя 2017) | 4 lines
 
-+ Url: ArrayAccess,Iterator,Countable for query parameters.
-
-------------------------------------------------------------------------
-r693 | anrdaemon | 2017-10-29 04:29:58 +0300 (Вс, 29 окт 2017) | 2 lines
-
-* Normalize query array.
+- Less dumb Url::__toString() conversion.
+  Omit parts that make no sense without other parts.
+  Check if path is absolute when host is present.
 
 ------------------------------------------------------------------------
-r690 | anrdaemon | 2017-10-22 22:56:42 +0300 (Вс, 22 окт 2017) | 4 lines
+r696 | anrdaemon | 2017-11-01 20:00:29 +0300 (Ср, 01 ноя 2017) | 3 lines
 
-* Handle initial values more gracefully.
-* Always decode query string.
-* Remove unused class properties.
-
-------------------------------------------------------------------------
-r689 | anrdaemon | 2017-10-20 01:06:24 +0300 (Пт, 20 окт 2017) | 2 lines
-
-* Fix key merging.
+* Decode user/pass/host/fragment
+* Force port to int.
 
 ------------------------------------------------------------------------
-r688 | anrdaemon | 2017-10-20 00:48:42 +0300 (Пт, 20 окт 2017) | 2 lines
+r695 | anrdaemon | 2017-10-30 04:37:23 +0300 (Пн, 30 окт 2017) | 3 lines
 
-* Improve rendering of all parts.
-
-------------------------------------------------------------------------
-r687 | anrdaemon | 2017-10-20 00:32:39 +0300 (Пт, 20 окт 2017) | 3 lines
-
-* Improve query part rendering.
-* Improve fragment part rendering.
-
-------------------------------------------------------------------------
-r686 | anrdaemon | 2017-10-16 02:15:13 +0300 (Пн, 16 окт 2017) | 2 lines
-
-+ Allow isset() on Url parts.
-
-------------------------------------------------------------------------
-r685 | anrdaemon | 2017-10-15 21:50:02 +0300 (Вс, 15 окт 2017) | 3 lines
-
-* Decode path when parsing URL.
-  Leaving %2F encoded.
-
-------------------------------------------------------------------------
-r680 | anrdaemon | 2017-09-05 17:05:40 +0300 (Вт, 05 сен 2017) | 2 lines
-
-+ Misc\Url
++ Much documentation.
+* Rewrite constructor to make more sense.
 
 ------------------------------------------------------------------------

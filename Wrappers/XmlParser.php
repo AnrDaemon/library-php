@@ -2,7 +2,7 @@
 /** XML Parser wrapper
 *
 * @package Wrappers\XmlParser
-* @version SVN: $Id: XmlParser.php 491 2016-02-24 12:58:51Z anrdaemon $
+* @version SVN: $Id: XmlParser.php 700 2017-11-02 21:09:07Z anrdaemon $
 */
 
 namespace AnrDaemon\Wrappers;
@@ -141,9 +141,9 @@ abstract class XmlParser
 
   final function __call($name, $arguments)
   {
-    // JSON_OPTIONS(832) = JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PARTIAL_OUTPUT_ON_ERROR;
+    // JSON_OPTIONS(1856) = JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PARTIAL_OUTPUT_ON_ERROR | JSON_PRESERVE_ZERO_FRACTION;
     // Bare numeric value for compatibility with versions that do not have certain capabilities.
-    print __CLASS__ . "::$name " . @json_encode($arguments, 832) . "\n";
+    print __CLASS__ . "::$name " . json_encode($arguments, 1856) . "\n";
     throw new \BadMethodCallException(__CLASS__ . "::$name is not implemented. Care to lend a hand?");
   }
 }

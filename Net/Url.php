@@ -1,7 +1,7 @@
 <?php
 /** URL handling class.
 *
-* @version SVN: $Id: Url.php 703 2017-11-03 00:36:44Z anrdaemon $
+* @version SVN: $Id: Url.php 705 2017-11-03 01:26:01Z anrdaemon $
 */
 
 namespace AnrDaemon\Net;
@@ -358,8 +358,8 @@ implements \Iterator, \ArrayAccess, \Countable
 
       $result .= idn_to_ascii($parts['host']);
 
-      if(isset($parts['port'], $parts['scheme'], $this::$defaultPorts[$parts['scheme']]))
-        if($parts['port'] == $this::$defaultPorts[$parts['scheme']])
+      if(isset($parts['port'], $parts['scheme'], self::$defaultPorts[$parts['scheme']]))
+        if($parts['port'] == self::$defaultPorts[$parts['scheme']])
           unset($parts['port']);
 
       if(isset($parts['port']))

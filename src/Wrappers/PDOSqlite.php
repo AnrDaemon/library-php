@@ -2,7 +2,7 @@
 /** PDO SQLite enhancement wrapper
 *
 * @package Wrappers
-* @version SVN: $Id: PDOSqlite.php 683 2017-09-29 01:06:21Z anrdaemon $
+* @version SVN: $Id: PDOSqlite.php 738 2018-03-03 19:03:36Z anrdaemon $
 */
 
 namespace AnrDaemon\Wrappers;

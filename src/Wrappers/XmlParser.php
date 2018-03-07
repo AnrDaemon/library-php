@@ -2,7 +2,7 @@
 /** XML Parser wrapper
 *
 * @package Wrappers\XmlParser
-* @version SVN: $Id: XmlParser.php 700 2017-11-02 21:09:07Z anrdaemon $
+* @version SVN: $Id: XmlParser.php 738 2018-03-03 19:03:36Z anrdaemon $
 */
 
 namespace AnrDaemon\Wrappers;

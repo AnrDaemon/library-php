@@ -1,7 +1,7 @@
 <?php
 /** URL handling class.
 *
-* @version SVN: $Id: Url.php 705 2017-11-03 01:26:01Z anrdaemon $
+* @version SVN: $Id: Url.php 738 2018-03-03 19:03:36Z anrdaemon $
 */
 
 namespace AnrDaemon\Net;
@@ -12,7 +12,7 @@ namespace AnrDaemon\Net;
 * is to create a new instance of the class.
 *
 * The class is always trying to populate host/port and scheme upon creation. You may override
-* them later on using {@see Url::setParts() self::setParts()}.
+* them later on using {@see \AnrDaemon\Net\Url::setParts() self::setParts()}.
 *
 * When parsing the input URI or setting parts, empty values are stripped.
 *
@@ -35,7 +35,7 @@ implements \Iterator, \ArrayAccess, \Countable
   * @var array $defaultPorts The list of well-known schemes and associated ports.
   * @source 1 16 The current list of well-known schemes:
   */
-  private static $defaultPorts = array(
+  protected static $defaultPorts = array(
     'ftp' => 21,
     'ftps' => 990,
     'gopher' => 70,
@@ -56,7 +56,7 @@ implements \Iterator, \ArrayAccess, \Countable
 
   /**
   * @var array $params Internal array holding the URI parts.
-  * @source 1 8 The current list of well-known schemes:
+  * @source 1 8 Parts list:
   */
   protected $params = array(
     'scheme' => null, // - e.g. http
@@ -69,12 +69,47 @@ implements \Iterator, \ArrayAccess, \Countable
     'fragment' => null, // - after the hashmark #
   );
 
+  /** @var string Cached representation of this object. */
+  protected $uri;
+
+  /** @internal Parse URL and throw exception on error.
+  * @param string $url
+  * @return array
+  * @see \parse_url()
+  */
+  protected function _parse_url($url)
+  {
+    // TODO: Correctly handle mailto: scheme https://3v4l.org/S0AIa mailto://user@example.org
+    $parts = parse_url($url);
+    if($parts === false)
+      throw new \InvalidArgumentException("Provided string can not be parsed as valid URL.");
+
+    return $parts;
+  }
+
+  /** @internal Parse query string and return resulting array.
+  *
+  * If input is not a string, the input returned unmodified.
+  *
+  * @param string $string
+  * @return array
+  * @see \parse_str()
+  */
+  protected function _parse_str($string)
+  {
+    if(!is_string($string))
+      return $string;
+
+    parse_str($string, $query);
+    return $query;
+  }
+
   /** @internal Recursive ksort
   * @param array &$array
   * @return void
   * @see \ksort()
   */
-  protected function rksort(&$array)
+  protected function _rksort(&$array)
   {
     if(is_array($array))
     {
@@ -108,12 +143,9 @@ implements \Iterator, \ArrayAccess, \Countable
   * @param string $url An URL to parse.
   * @return Url A new class instance with corresponding parts replaced.
   */
-  function parse($url)
+  public function parse($url)
   {
-    // TODO: Correctly handle mailto: scheme https://3v4l.org/S0AIa mailto://user@example.org
-    $parts = parse_url($url);
-    if($parts === false)
-      throw new \InvalidArgumentException("Provided string can not be parsed as valid URL.");
+    $parts = $this->_parse_url($url);
 
     foreach(array('user', 'pass', 'fragment') as $part)
       if(isset($parts[$part]))
@@ -121,11 +153,6 @@ implements \Iterator, \ArrayAccess, \Countable
 
     if(isset($parts['host']))
       $parts['host'] = idn_to_utf8($parts['host']);
-
-    // Force port to be numeric.
-    // If it would fail to convert (converts to zero), self::setParts() will strip it.
-    if(isset($parts['port']))
-      $parts['port'] = (int)$parts['port'];
 
     if(isset($parts['path']))
       $parts['path'] = urldecode(str_ireplace('%2F', '%252F', $parts['path']));
@@ -140,20 +167,185 @@ implements \Iterator, \ArrayAccess, \Countable
   * Note: The `query` part is always decoded into an array.
   *
   * @param array $parts A set of parts to replace. Uses the same names parse_url uses.
-  * @return Url A new class instance with corresponding parts replaced.
+  * @return \AnrDaemon\Net\Url A new class instance with corresponding parts replaced.
   */
-  function setParts(array $parts)
+  public function setParts(array $parts)
   {
-    /** Reset empty replacement parts to null
-    *
-    * Avoid creation of replacement array keys if they are not set.
-    */
-    foreach(array_keys($this->params) as $part)
-      if(isset($parts[$part]) && empty($parts[$part]))
-        $parts[$part] = null;
+    /** Filter input array */
+    $parts = array_intersect_key($parts, $this->params);
 
+    // Force port to be numeric.
+    // If it would fail to convert (converts to zero), we will strip it.
     if(isset($parts['port']))
       $parts['port'] = (int)$parts['port'];
+
+    /** Reset empty replacement parts to null
+    *
+    * Avoiding creation of replacement array keys if they are not set.
+    */
+    array_walk(
+      $parts,
+      function(&$part, $key)
+      {
+        $part = $part ?: null;
+      }
+    );
+
+    if(isset($parts['query']))
+    {
+      $query = $this->_parse_str($parts['query']);
+      $this->_rksort($query);
+      $parts['query'] = $query;
+    }
+
+    $self = clone $this;
+    $self->params = array_replace($this->params, $parts);
+    return $self;
+  }
+
+// Magic!
+
+  /** Create default instance of a self-reference URL.
+  *
+  * Try hard to discover the request scheme, server name and port.
+  *
+  * The server name is looked in `$_SERVER['SERVER_NAME']`, then in
+  * `$_SERVER['HTTP_HOST']`, if not found.
+  *
+  * The server port is taken from `$_SERVER['SERVER_PORT']`, or if
+  * `$_SERVER['HTTP_HOST']` is used to set the server name, the port
+  * is looked in there as well.
+  *
+  * Hint: Provide an empty `$query` array to override any potential `$baseUrl` query part.
+  *
+  * @param ?string $baseUrl An optional initial URL to set defaults from.
+  * @param ?array $query An optional query key-value pairs.
+  */
+  public function __construct($baseUrl = null, array $query = null)
+  {
+    if(isset($baseUrl))
+    {
+      if($baseUrl === '')
+        return;
+
+      $self = $this->parse($baseUrl);
+
+      if(is_array($query))
+      {
+        $self = $self->setParts(['query' => $query]);
+      }
+
+      $this->params = $self->params;
+    }
+    else
+    {
+      foreach(array(
+        'scheme' => "REQUEST_SCHEME",
+        'host' => 'SERVER_NAME',
+        'port' => 'SERVER_PORT'
+      ) as $key => $header)
+      {
+        $parts[$key] = empty($_SERVER[$header]) ? null : $_SERVER[$header];
+      }
+
+      if(empty($parts['host']) && !empty($_SERVER['HTTP_HOST']))
+      {
+        $fwd = $this->_parse_url("//{$_SERVER['HTTP_HOST']}");
+
+        if(isset($fwd['host']))
+        {
+          $parts['host'] = idn_to_utf8($fwd['host']);
+          if(isset($fwd['port']))
+          {
+            $parts['port'] = $fwd['port'];
+          }
+        }
+      }
+
+      if(is_array($query))
+      {
+        $parts['query'] = $query;
+      }
+
+      $this->params = $this->setParts($parts)->params;
+    }
+  }
+
+  /** @internal */
+  public function __clone()
+  {
+    $this->uri = null;
+  }
+
+  /** @internal */
+  public function __get($index)
+  {
+    return $this->params[$index];
+  }
+
+  /** @internal */
+  public function __isset($index)
+  {
+    return isset($this->params[$index]);
+  }
+
+  /** Converts URL to a sting representation.
+  *
+  * If URI scheme is specified, some well-known schemes are considered
+  * and default port number is omitted from the resulting URI.
+  *
+  * @return string an URL-encoded string representation of the object.
+  */
+  public function __toString()
+  {
+    if($this->uri)
+      return $this->uri;
+
+    $parts = $this->params;
+    $result = '';
+
+    if(isset($parts['scheme']))
+      $result .= $parts['scheme'] . ":";
+
+    if(isset($parts['host']))
+    {
+      $result .= "//";
+
+      if(isset($parts['user']))
+      {
+        $result .= rawurlencode($parts['user']);
+
+        if(isset($parts['pass']))
+          $result .= ":" . rawurlencode($parts['pass']);
+
+        $result .= "@";
+      }
+
+      $result .= idn_to_ascii($parts['host']);
+
+      if(isset($parts['port'], $parts['scheme'], self::$defaultPorts[$parts['scheme']]))
+        if($parts['port'] == self::$defaultPorts[$parts['scheme']])
+          unset($parts['port']);
+
+      if(isset($parts['port']))
+        $result .= ":" . $parts['port'];
+    }
+
+    if(isset($parts['path']))
+    {
+      if(isset($parts['host']) && $parts['path'][0] !== '/')
+        throw new \UnexpectedValueException("Host is set but path is not absolute; unable to convert to string");
+
+      $path = explode('%2F', $parts['path']);
+      $result .= implode('%2F', array_map(function($part){
+        /*
+          BUG?: paths containing, f.e., "@" are encoded.
+          For future reference:
+          https://tools.ietf.org/html/rfc3986#section-2.2
+        */
+        return implode('/', array_map('rawurlencode', explode('/', $part)));
+      }, $path));
+    }
 
     if(isset($parts['query']))
     {
@@ -165,14 +357,13 @@ implements \Iterator, \ArrayAccess, \Countable
       {
         parse_str($parts['query'], $query);
       }
-
-      $this->rksort($query);
-      $parts['query'] = $query;
+      $result .= "?" . http_build_query($query);
     }
 
-    $self = clone $this;
-    $self->params = array_replace($this->params, array_intersect_key($parts, $this->params));
-    return $self;
+    if(isset($parts['fragment']))
+      $result .= "#" . rawurlencode($parts['fragment']);
+
+    return $this->uri = $result;
   }
 
 // ArrayAccess
@@ -257,147 +448,5 @@ implements \Iterator, \ArrayAccess, \Countable
   public function valid()
   {
     return !is_null($this->key());
-  }
-
-// Magic!
-
-  /** Create default instance of a self-reference URL.
-  *
-  * Try hard to discover the request scheme, server name and port.
-  *
-  * The server name is looked in `$_SERVER['SERVER_NAME']`, then in
-  * `$_SERVER['HTTP_HOST']`, if not found.
-  *
-  * The server port is taken from `$_SERVER['SERVER_PORT']`, or if
-  * `$_SERVER['HTTP_HOST']` is used to set the server name, the port
-  * is looked in there as well.
-  *
-  * Hint: Provide an empty `$query` array to override any potential `$baseUrl` query part.
-  *
-  * @param ?string $baseUrl An optional initial URL to set defaults from.
-  * @param ?array $query An optional query key-value pairs.
-  */
-  function __construct($baseUrl = null, array $query = null)
-  {
-    $parts = isset($baseUrl) ? $this->parse($baseUrl)->params : array();
-
-    foreach(array(
-      'scheme' => "REQUEST_SCHEME",
-      'host' => 'SERVER_NAME',
-      'port' => 'SERVER_PORT'
-    ) as $key => $header)
-    {
-      if(empty($parts[$key]))
-      {
-        $parts[$key] = empty($_SERVER[$header]) ? null : $_SERVER[$header];
-      }
-    }
-
-    if(empty($parts['host']) && !empty($_SERVER['HTTP_HOST']))
-    {
-      $fwd = parse_url("//{$_SERVER['HTTP_HOST']}");
-
-      if(isset($fwd['host']))
-      {
-        $parts['host'] = $fwd['host'];
-        if(isset($fwd['port']))
-        {
-          $parts['port'] = $fwd['port'];
-        }
-      }
-    }
-
-    if(isset($query))
-    {
-      $parts['query'] = $query;
-    }
-
-    $this->params = $this->setParts($parts)->params;
-  }
-
-  /** @internal */
-  function __get($index)
-  {
-    return $this->params[$index];
-  }
-
-  /** @internal */
-  function __isset($index)
-  {
-    return isset($this->params[$index]);
-  }
-
-  /** Converts URL to a sting representation.
-  *
-  * If URI scheme is specified, some well-known schemes are considered
-  * and default port number is omitted from the resulting URI.
-  *
-  * @return string an URL-encoded string representation of the object.
-  */
-  function __toString()
-  {
-    $parts = $this->params;
-    $result = '';
-
-    if(isset($parts['scheme']))
-      $result .= $parts['scheme'] . ":";
-
-    if(isset($parts['host']))
-    {
-      $result .= "//";
-
-      if(isset($parts['user']))
-      {
-        $result .= rawurlencode($parts['user']);
-
-        if(isset($parts['pass']))
-          $result .= ":" . rawurlencode($parts['pass']);
-
-        $result .= "@";
-      }
-
-      $result .= idn_to_ascii($parts['host']);
-
-      if(isset($parts['port'], $parts['scheme'], self::$defaultPorts[$parts['scheme']]))
-        if($parts['port'] == self::$defaultPorts[$parts['scheme']])
-          unset($parts['port']);
-
-      if(isset($parts['port']))
-        $result .= ":" . $parts['port'];
-    }
-
-    if(isset($parts['path']))
-    {
-      if(isset($parts['host']) && $parts['path'][0] !== '/')
-        throw new \UnexpectedValueException("Host is set but path is not absolute; unable to convert to string");
-
-      $path = explode('%2F', $parts['path']);
-      $result .= implode('%2F', array_map(function($part){
-        /*
-          BUG?: paths containing, f.e., "@" are encoded.
-          For future reference:
-          https://tools.ietf.org/html/rfc3986#section-2.2
-        */
-        return implode('/', array_map('rawurlencode', explode('/', $part)));
-      }, $path));
-    }
-
-    if(isset($parts['query']))
-    {
-      if(is_array($parts['query']))
-      {
-        $query = $parts['query'];
-      }
-      else
-      {
-        parse_str($parts['query'], $query);
-      }
-      $result .= "?" . http_build_query($query);
-    }
-
-    if(isset($parts['fragment']))
-      $result .= "#" . rawurlencode($parts['fragment']);
-
-    return $result;
   }
 }

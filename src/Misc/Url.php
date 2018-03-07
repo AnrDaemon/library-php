@@ -1,7 +1,7 @@
 <?php
 /** Net\Url legacy wrapper
 *
-* @version SVN: $Id: Url.php 704 2017-11-03 00:39:21Z anrdaemon $
+* @version SVN: $Id: Url.php 738 2018-03-03 19:03:36Z anrdaemon $
 */
 
 namespace AnrDaemon\Misc;

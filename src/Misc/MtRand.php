@@ -1,7 +1,7 @@
 <?php
 /** mt_rand based RNG wrappers.
 *
-* @version SVN: $Id: MtRand.php 609 2016-07-27 01:33:09Z anrdaemon $
+* @version SVN: $Id: MtRand.php 738 2018-03-03 19:03:36Z anrdaemon $
 */
 
 namespace AnrDaemon\Misc;

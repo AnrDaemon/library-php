@@ -1,24 +1,60 @@
 ------------------------------------------------------------------------
-r705 | anrdaemon | 2017-11-03 04:26:01 +0300 (Пт, 03 ноя 2017) | 2 lines
+r742 | anrdaemon | 2018-03-07 03:34:40 +0300 (Wed, 07 Mar 2018) | 2 lines
 
-* Fixed ports dictionary reference.
-
-------------------------------------------------------------------------
-r704 | anrdaemon | 2017-11-03 03:39:21 +0300 (Пт, 03 ноя 2017) | 2 lines
-
-* Add legacy Net\Url wrapper.
++ Misc\BitFlags + some light testing.
 
 ------------------------------------------------------------------------
-r703 | anrdaemon | 2017-11-03 03:36:44 +0300 (Пт, 03 ноя 2017) | 2 lines
+r740 | anrdaemon | 2018-03-04 02:50:24 +0300 (Sun, 04 Mar 2018) | 3 lines
 
-= Move Net\Url to its rightful place.
+* Hard bind classloader function calls to root namespace.
+- Remove unnecessary stuff from classloader.
 
 ------------------------------------------------------------------------
-r701 | anrdaemon | 2017-11-03 03:12:58 +0300 (Пт, 03 ноя 2017) | 5 lines
+r738 | anrdaemon | 2018-03-03 22:03:36 +0300 (Sat, 03 Mar 2018) | 3 lines
 
-* Add more default ports.
-* Move port omission to render.
-* Declare virtual class properties.
-* Much more documentation.
+= Move code to subdirectory.
++ Add some functional tests.
+
+------------------------------------------------------------------------
+r737 | anrdaemon | 2018-03-03 21:50:26 +0300 (Sat, 03 Mar 2018) | 3 lines
+
++ Explicitly create empty object from empty string URL.
+* Lighten up creation process overall.
+
+------------------------------------------------------------------------
+r736 | anrdaemon | 2018-03-03 21:14:52 +0300 (Sat, 03 Mar 2018) | 2 lines
+
+* Lighten up Url::setParts() logic.
+
+------------------------------------------------------------------------
+r735 | anrdaemon | 2018-03-03 21:01:46 +0300 (Sat, 03 Mar 2018) | 2 lines
+
+* Wrap parse_str and parse_url into usable methods.
+
+------------------------------------------------------------------------
+r734 | anrdaemon | 2018-03-03 20:30:12 +0300 (Sat, 03 Mar 2018) | 3 lines
+
+- Remove port type conversion from Url::parse()
+  Url::setParts() already handles it.
+
+------------------------------------------------------------------------
+r733 | anrdaemon | 2018-03-03 20:25:24 +0300 (Sat, 03 Mar 2018) | 2 lines
+
+* Normalize internal wrappers naming.
+
+------------------------------------------------------------------------
+r727 | anrdaemon | 2018-02-26 17:17:00 +0300 (Mon, 26 Feb 2018) | 2 lines
+
+* Actually universally stackable classloader.
+
+------------------------------------------------------------------------
+r709 | anrdaemon | 2017-11-28 22:10:42 +0300 (Tue, 28 Nov 2017) | 2 lines
+
++ Cache Url::__toString() representation.
+
+------------------------------------------------------------------------
+r708 | anrdaemon | 2017-11-28 22:09:53 +0300 (Tue, 28 Nov 2017) | 2 lines
+
+* Explicitly declare methods visibility.
 
 ------------------------------------------------------------------------

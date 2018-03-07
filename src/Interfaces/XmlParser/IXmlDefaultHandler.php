@@ -2,7 +2,7 @@
 /** XML Parser - Default handler support
 *
 * @package Wrappers\XmlParser
-* @version SVN: $Id: IXmlDefaultHandler.php 455 2016-02-16 00:51:31Z anrdaemon $
+* @version SVN: $Id: IXmlDefaultHandler.php 738 2018-03-03 19:03:36Z anrdaemon $
 */
 
 namespace AnrDaemon\Interfaces\XmlParser;

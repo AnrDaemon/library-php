@@ -2,7 +2,7 @@
 /** XML Parser error-to-exception wrapper.
 *
 * @package Wrappers\XmlParser
-* @version SVN: $Id: XmlParserError.php 491 2016-02-24 12:58:51Z anrdaemon $
+* @version SVN: $Id: XmlParserError.php 738 2018-03-03 19:03:36Z anrdaemon $
 */
 
 namespace AnrDaemon\Wrappers;

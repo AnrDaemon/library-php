@@ -1,7 +1,34 @@
 ------------------------------------------------------------------------
-r742 | anrdaemon | 2018-03-07 03:34:40 +0300 (Wed, 07 Mar 2018) | 2 lines
+r767 | anrdaemon | 2018-03-19 23:49:28 +0300 (Mon, 19 Mar 2018) | 2 lines
 
-+ Misc\BitFlags + some light testing.
+* Only confirm skipped tests for known mangled characters.
+
+------------------------------------------------------------------------
+r765 | anrdaemon | 2018-03-14 01:25:26 +0300 (Wed, 14 Mar 2018) | 2 lines
+
+* Implement mangled characters test.
+
+------------------------------------------------------------------------
+r764 | anrdaemon | 2018-03-14 01:24:28 +0300 (Wed, 14 Mar 2018) | 2 lines
+
+* Use more common host names.
+
+------------------------------------------------------------------------
+r763 | anrdaemon | 2018-03-14 00:50:47 +0300 (Wed, 14 Mar 2018) | 2 lines
+
++ Use dedicated normalization of parts array.
+
+------------------------------------------------------------------------
+r762 | anrdaemon | 2018-03-14 00:19:16 +0300 (Wed, 14 Mar 2018) | 4 lines
+
+* Split autoload.
+* Tweak tests semantics.
+* Put a note about parameter names mangling for Net\Url.
+
+------------------------------------------------------------------------
+r741 | anrdaemon | 2018-03-07 02:43:15 +0300 (Wed, 07 Mar 2018) | 2 lines
+
+* Tweak CodeStyle.
 
 ------------------------------------------------------------------------
 r740 | anrdaemon | 2018-03-04 02:50:24 +0300 (Sun, 04 Mar 2018) | 3 lines

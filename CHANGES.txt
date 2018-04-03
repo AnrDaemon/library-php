@@ -1,4 +1,15 @@
 ------------------------------------------------------------------------
+r788 | anrdaemon | 2018-04-03 17:58:56 +0300 (Tue, 03 Apr 2018) | 2 lines
+
++ Net\Browser initial release.
+
+------------------------------------------------------------------------
+r778 | anrdaemon | 2018-03-30 15:17:41 +0300 (Fri, 30 Mar 2018) | 3 lines
+
++ Added author.
++ Put notes/todo under version control.
+
+------------------------------------------------------------------------
 r767 | anrdaemon | 2018-03-19 23:49:28 +0300 (Mon, 19 Mar 2018) | 2 lines
 
 * Only confirm skipped tests for known mangled characters.

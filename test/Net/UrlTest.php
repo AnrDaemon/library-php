@@ -20,7 +20,23 @@ extends TestCase
     return $query;
   }
 
-  protected function getParams(Url $url)
+  protected function _normalized_parts(array $parts)
+  {
+    static $blank = [
+      'scheme' => null, // - e.g. http
+      'user' => null, //
+      'pass' => null, //
+      'host' => null, //
+      'port' => null, //
+      'path' => null, //
+      'query' => null, // - after the question mark ?
+      'fragment' => null, // - after the hashmark #
+    ];
+
+    return array_replace($blank, array_intersect_key($parts, $blank));
+  }
+
+  protected function getParts(Url $url)
   {
     $test = (function(){ return $this->params; })->bindTo($url, $url);
     return $test();
@@ -38,7 +54,7 @@ extends TestCase
     $schemes = [ null, 'http'];
     $users = [ null, 'user'];
     $passs = [ null, 'password'];
-    $hosts = [ null, 'host', 'www.host.tld'];
+    $hosts = [ null, 'localhost', 'www.example.org'];
     $ports = [ null, 8080];
     $paths = [ null, '/', '/path', '/path/'];
     $querys = [ null, 'query=string'];
@@ -104,7 +120,8 @@ extends TestCase
       if($value)
       {
         $data += [
-          $value => [$value, [
+          $value => [$value,
+          $this->_normalized_parts([
             'scheme' => $scheme, //
             'user' => $user, //
             'pass' => $password, //
@@ -113,9 +130,29 @@ extends TestCase
             'path' => $path, //
             'query' => $this->_parse_str($query), // Convert query string to array
             'fragment' => $fragment, //
-          ]],
+          ])],
         ];
       }
+    }
+
+    return $data;
+  }
+
+  /** Provide a list of potentially mangled characters
+  */
+  public function mangledCharsProvider()
+  {
+    $list = array_diff(range(' ', '~'), range('0', '9'), range('A', 'Z'), range('a', 'z'), ['&', ';']);
+    $data = [];
+    foreach($list as $char)
+    {
+      $name = "?" . urlencode($char) . "=1";
+      $data["'{$name}' ($char)"] = [
+        $name,
+        $this->_normalized_parts([
+          'query' => [$char => '1'],
+        ]),
+      ];
     }
 
     return $data;
@@ -161,16 +198,7 @@ extends TestCase
   */
   public function testCreateEmptyClassFromEmptyString()
   {
-    $this->assertTrue([
-      'scheme' => null, // - e.g. http
-      'user' => null, //
-      'pass' => null, //
-      'host' => null, //
-      'port' => null, //
-      'path' => null, //
-      'query' => null, // - after the question mark ?
-      'fragment' => null, // - after the hashmark #
-    ] === $this->getParams(new Url('')));
+    $this->assertTrue($this->_normalized_parts([]) === $this->getParts(new Url('')));
   }
 
   /** Test if parsing invalid URL throws exception.
@@ -188,9 +216,32 @@ extends TestCase
   * @dataProvider validListProvider
   * @depends testCreateEmptyClassFromEmptyString
   */
-  public function testParseValidUrl($url, $params)
+  public function testParseValidUrl($url, $parts)
   {
-    $this->assertTrue($params === $this->getParams($this->url->parse($url)));
+    $this->assertTrue($parts === $this->getParts($this->url->parse($url)));
+  }
+
+  /** Test parsing of valid URL's mandgled by PHP's parse_str
+  *
+  * @see http://php.net/manual/en/language.variables.external.php Variables From External Sources
+  * @dataProvider mangledCharsProvider
+  * @depends testCreateEmptyClassFromEmptyString
+  */
+  public function testParseQueryString($url, $parts)
+  {
+    try
+    {
+      $this->assertTrue($parts === $this->getParts($this->url->parse($url)));
+    }
+    catch(\PHPUnit_Framework_ExpectationFailedException $e)
+    {
+      $key = array_keys($parts['query']);
+      $key = reset($key);
+      if(in_array($key, [' ', '.', '[']))
+        return $this->markTestIncomplete('Mangled names of variables from external sources.');
+
+      throw $e;
+    }
   }
 
   /** Test scheme-port normalization for well-known protocols

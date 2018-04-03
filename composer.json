@@ -2,6 +2,12 @@
     "name": "anrdaemon/library",
     "description": "Published classes from private library",
     "license": "WTFPL",
+    "authors": [
+        {
+            "name": "Andrey Repin",
+            "email": "anrdaemon@yandex.ru"
+        }
+    ],
     "require": {
         "php": "^5.3.6 || ^7.0"
     },
@@ -13,7 +19,11 @@
     },
     "autoload": {
         "psr-4": {
-            "AnrDaemon\\": "src/",
+            "AnrDaemon\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
             "AnrDaemon\\Tests\\": "test/"
         }
     },

@@ -1,7 +1,7 @@
 <?php
 /** URL handling class.
 *
-* @version SVN: $Id: Url.php 738 2018-03-03 19:03:36Z anrdaemon $
+* @version SVN: $Id: Url.php 767 2018-03-19 20:49:28Z anrdaemon $
 */
 
 namespace AnrDaemon\Net;
@@ -11,10 +11,14 @@ namespace AnrDaemon\Net;
 * The class is a read-only collection, the only way to modify its contents
 * is to create a new instance of the class.
 *
-* The class is always trying to populate host/port and scheme upon creation. You may override
-* them later on using {@see \AnrDaemon\Net\Url::setParts() self::setParts()}.
+* The class is always trying to populate host/port and scheme upon creation,
+* unless an empty URL is provided explicitly. You may override them later on
+* using {@see \AnrDaemon\Net\Url::parse() self::parse()} or {@see \AnrDaemon\Net\Url::setParts() self::setParts()}.
 *
-* When parsing the input URI or setting parts, empty values are stripped.
+* When parsing the URI or setting parts, empty values are stripped.
+*
+* Warning: PHP compat: PHP ({@see \parse_str parse_str()}) converts certain characters in request variable names.
+* See Note after Example 3 on http://php.net/variables.external#example-88
 *
 * URL parts can be accessed as properties (`$url->path`), query parts
 * can be accessed as array indices (`$url['param']`).
@@ -99,7 +103,7 @@ implements \Iterator, \ArrayAccess, \Countable
   {
     if(!is_string($string))
       return $string;
-
+    // TODO:query strtok($query, ini_get('arg_separator.input'));
     parse_str($string, $query);
     return $query;
   }

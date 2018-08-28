@@ -1,7 +1,7 @@
 <?php
 /** URL handling class.
 *
-* @version SVN: $Id: Url.php 767 2018-03-19 20:49:28Z anrdaemon $
+* @version SVN: $Id: Url.php 857 2018-08-28 00:26:18Z anrdaemon $
 */
 
 namespace AnrDaemon\Net;
@@ -33,7 +33,7 @@ namespace AnrDaemon\Net;
 * @property-read string $fragment Part after the hashmark "#".
 */
 class Url
-implements \Iterator, \ArrayAccess, \Countable
+implements \IteratorAggregate, \ArrayAccess, \Countable
 {
   /**
   * @var array $defaultPorts The list of well-known schemes and associated ports.
@@ -86,7 +86,7 @@ implements \Iterator, \ArrayAccess, \Countable
     // TODO: Correctly handle mailto: scheme https://3v4l.org/S0AIa mailto://user@example.org
     $parts = parse_url($url);
     if($parts === false)
-      throw new \InvalidArgumentException("Provided string can not be parsed as valid URL.");
+      throw new \InvalidArgumentException("Provided argument can not be parsed as valid URL.");
 
     return $parts;
   }
@@ -101,7 +101,7 @@ implements \Iterator, \ArrayAccess, \Countable
   */
   protected function _parse_str($string)
   {
-    if(!is_string($string))
+    if(is_array($string))
       return $string;
     // TODO:query strtok($query, ini_get('arg_separator.input'));
     parse_str($string, $query);
@@ -120,6 +120,87 @@ implements \Iterator, \ArrayAccess, \Countable
       ksort($array);
       array_walk($array, array($this, __FUNCTION__));
     }
+  }
+
+  /** Creates Url instance from HTTP request metadata, such as $_SERVER[REQUEST_*] and $_SERVER[HTTP_*] variables.
+  *
+  * Function uses data available in the request environment to construct the so-called self-reference.
+  *
+  * The order in which environment is processed is as follows:
+  *
+  *  1. X-Forwarded-* headers.
+  *  2. The entire REQUEST_URI variable as set by SAPI.
+  *  3. REQUEST_SCHEME / SERVER_NAME / SERVER_PORT variables from SAPI.
+  *  4. The Host header in case host part was not set yet.
+  *
+  * If $trust_x_forwarded_headers is true (the default), the following headers are considered:
+  *
+  *  - X-Forwarded-Proto - original protocol the request received with (f.e. https);
+  *  - X-Forwarded-Port - original receiving port;
+  *  - X-Forwarded-Host - host (and possible port, if not set by X-Forwarded-Port) the original request received for.
+  *
+  * It is stronly recommended to configure calling webserver to override X-Forwarded-* headers an application
+  * should not trust.
+  *
+  * Application should receive an already sanitized environment it could rely upon.
+  *
+  * @param array $override An array of parts to override. {@see \AnrDaemon\Net\Url::setParts() self::setParts()}
+  * @param bool $trust_x_forwarded_headers To trust the X-Forwarded-{Host,Port,Proto,etc.} headers or not.
+  * @return Url A new class instance.
+  */
+  public static function fromHttp(array $overrides = [], $trust_x_forwarded_headers = true)
+  {
+    $self = new static("");
+    $parts = [];
+
+    if($trust_x_forwarded_headers)
+    {
+      foreach(array(
+        'scheme' => "HTTP_X_FORWARDED_PROTO",
+        'port' => "HTTP_X_FORWARDED_PORT",
+      ) as $key => $header)
+      {
+        if(!empty($_SERVER[$header]))
+        {
+          $parts += [$key => $_SERVER[$header]];
+        }
+      }
+
+      if(!empty($_SERVER["HTTP_X_FORWARDED_HOST"]))
+      {
+        $parts += $self->_parse_url("//{$_SERVER["HTTP_X_FORWARDED_HOST"]}");
+      }
+    }
+
+    if(!empty($_SERVER["REQUEST_URI"]))
+    {
+      $parts += $self->_parse_url($_SERVER["REQUEST_URI"]);
+    }
+
+    foreach(array(
+      'scheme' => "REQUEST_SCHEME",
+      'host' => "SERVER_NAME",
+      'port' => "SERVER_PORT",
+    ) as $key => $header)
+    {
+      if(!isset($parts[$key]) && !empty($_SERVER[$header]))
+      {
+        $parts += [$key => $_SERVER[$header]];
+      }
+    }
+
+    /** Parse Host: header as host[:port] */
+    if(empty($parts['host']) && !empty($_SERVER['HTTP_HOST']))
+    {
+      $parts += $self->_parse_url("//{$_SERVER['HTTP_HOST']}");
+    }
+
+    if(!empty($parts['host']))
+    {
+      $parts['host'] = idn_to_utf8($parts['host'], 0, INTL_IDNA_VARIANT_UTS46);
+    }
+
+    return $self->setParts($overrides + $parts);
   }
 
   /** Parse an URL into replacement parts and create a new class instance using them
@@ -159,7 +240,7 @@ implements \Iterator, \ArrayAccess, \Countable
       $parts['host'] = idn_to_utf8($parts['host']);
 
     if(isset($parts['path']))
-      $parts['path'] = urldecode(str_ireplace('%2F', '%252F', $parts['path']));
+      $parts['path'] = rawurldecode(str_ireplace('%2F', '%252F', $parts['path']));
 
     return $this->setParts($parts);
   }
@@ -178,23 +259,14 @@ implements \Iterator, \ArrayAccess, \Countable
     /** Filter input array */
     $parts = array_intersect_key($parts, $this->params);
 
-    // Force port to be numeric.
-    // If it would fail to convert (converts to zero), we will strip it.
+    /** Force port to be numeric.
+    *
+    * If it would fail to convert (converts to zero), we will strip it.
+    */
     if(isset($parts['port']))
       $parts['port'] = (int)$parts['port'];
 
-    /** Reset empty replacement parts to null
-    *
-    * Avoiding creation of replacement array keys if they are not set.
-    */
-    array_walk(
-      $parts,
-      function(&$part, $key)
-      {
-        $part = $part ?: null;
-      }
-    );
-
+    /** Convert query string to ksort()'ed array */
     if(isset($parts['query']))
     {
       $query = $this->_parse_str($parts['query']);
@@ -202,77 +274,60 @@ implements \Iterator, \ArrayAccess, \Countable
       $parts['query'] = $query;
     }
 
+    /** Reset empty replacement parts to null
+    *
+    * This simplifies later checks for existence of URL parts.
+    */
+    array_walk(
+      $parts,
+      function(&$part, $key)
+      {
+        if(is_string($part))
+        { /** Use strlen() instead of empty() to account for possible "0" values
+          *
+          * Valid case for (f.e.) user/pass parts.
+          */
+          $part = strlen($part) ? $part : null;
+        }
+        else
+        {
+          $part = $part ?: null;
+        }
+      }
+    );
+
     $self = clone $this;
+    // Keep URL parts in the same order at all times.
     $self->params = array_replace($this->params, $parts);
     return $self;
   }
 
 // Magic!
 
-  /** Create default instance of a self-reference URL.
+  /** Create a representation of an URL.
   *
-  * Try hard to discover the request scheme, server name and port.
+  * Without parameters, the class creates an "empty" URL.
   *
-  * The server name is looked in `$_SERVER['SERVER_NAME']`, then in
-  * `$_SERVER['HTTP_HOST']`, if not found.
+  * If base URL is specified, it will be used as template to fill parts.
   *
-  * The server port is taken from `$_SERVER['SERVER_PORT']`, or if
-  * `$_SERVER['HTTP_HOST']` is used to set the server name, the port
-  * is looked in there as well.
+  * Hint: Provide an empty `$query` array to override any potential base URL query part.
   *
-  * Hint: Provide an empty `$query` array to override any potential `$baseUrl` query part.
-  *
-  * @param ?string $baseUrl An optional initial URL to set defaults from.
+  * @param ?string $baseUrl An optional base URL to set defaults from.
   * @param ?array $query An optional query key-value pairs.
   */
   public function __construct($baseUrl = null, array $query = null)
   {
-    if(isset($baseUrl))
+    if(!isset($baseUrl) || $baseUrl === '')
+      return;
+
+    $self = $this->parse($baseUrl);
+
+    if(is_array($query))
     {
-      if($baseUrl === '')
-        return;
-
-      $self = $this->parse($baseUrl);
-
-      if(is_array($query))
-      {
-        $self = $self->setParts(['query' => $query]);
-      }
-
-      $this->params = $self->params;
+      $self = $self->setParts(['query' => $query]);
     }
-    else
-    {
-      foreach(array(
-        'scheme' => "REQUEST_SCHEME",
-        'host' => 'SERVER_NAME',
-        'port' => 'SERVER_PORT'
-      ) as $key => $header)
-      {
-        $parts[$key] = empty($_SERVER[$header]) ? null : $_SERVER[$header];
-      }
 
-      if(empty($parts['host']) && !empty($_SERVER['HTTP_HOST']))
-      {
-        $fwd = $this->_parse_url("//{$_SERVER['HTTP_HOST']}");
-
-        if(isset($fwd['host']))
-        {
-          $parts['host'] = idn_to_utf8($fwd['host']);
-          if(isset($fwd['port']))
-          {
-            $parts['port'] = $fwd['port'];
-          }
-        }
-      }
-
-      if(is_array($query))
-      {
-        $parts['query'] = $query;
-      }
-
-      $this->params = $this->setParts($parts)->params;
-    }
+    $this->params = $self->params;
   }
 
   /** @internal */
@@ -409,48 +464,12 @@ implements \Iterator, \ArrayAccess, \Countable
     return empty($this->params['query']) ? 0 : count($this->params['query']);
   }
 
-// Iterator
+// IteratorAggregate
 
   /** @internal
-  @see \Iterator::current() */
-  public function current()
+  @see \IteratorAggregate::getIterator() */
+  public function getIterator()
   {
-    if(is_array($this->params['query']))
-      return current($this->params['query']);
-    else
-      return null;
-  }
-
-  /** @internal
-  @see \Iterator::key() */
-  public function key()
-  {
-    if(is_array($this->params['query']))
-      return key($this->params['query']);
-    else
-      return null;
-  }
-
-  /** @internal
-  @see \Iterator::next() */
-  public function next()
-  {
-    if(is_array($this->params['query']))
-      next($this->params['query']);
-  }
-
-  /** @internal
-  @see \Iterator::rewind() */
-  public function rewind()
-  {
-    if(is_array($this->params['query']))
-      reset($this->params['query']);
-  }
-
-  /** @internal
-  @see \Iterator::valid() */
-  public function valid()
-  {
-    return !is_null($this->key());
+    return new \ArrayIterator($this->params['query']);
   }
 }

@@ -33,12 +33,21 @@ extends TestCase
       'fragment' => null, // - after the hashmark #
     ];
 
+    // Keep parts in static order
     return array_replace($blank, array_intersect_key($parts, $blank));
+  }
+
+  /** Provide a sample valid URI
+  */
+  public function sampleUrl()
+  {
+    return "//localhost/?x=y";
   }
 
   protected function getParts(Url $url)
   {
-    $test = (function(){ return $this->params; })->bindTo($url, $url);
+    $test = function() { return $this->params; };
+    $test = $test->bindTo($url, $url);
     return $test();
   }
 
@@ -56,7 +65,7 @@ extends TestCase
     $passs = [ null, 'password'];
     $hosts = [ null, 'localhost', 'www.example.org'];
     $ports = [ null, 8080];
-    $paths = [ null, '/', '/path', '/path/'];
+    $paths = [ null, '/', '/path', '/path/', '/path+/'];
     $querys = [ null, 'query=string'];
     $fragments = [ null, 'fragment'];
 
@@ -158,6 +167,123 @@ extends TestCase
     return $data;
   }
 
+  /** Provide _SERVER overrides for Url::fromHttp() method.
+  */
+  public function environmentProvider()
+  {
+    $data["(from X-Forwarded- headers (HX+SUNP))"] = [[
+      "HTTP_HOST" => "real.example.org",
+      "HTTP_X_FORWARDED_PROTO" => "https",
+      "HTTP_X_FORWARDED_HOST" => "real.example.org",
+      "HTTP_X_FORWARDED_PORT" => 80,
+      "REQUEST_SCHEME" => "http",
+      "REQUEST_URI" => "/",
+      "SERVER_NAME" => "upstream.example.org",
+      "SERVER_PORT" => 8080,
+      "trust" => true, // To trust X-Forwarded-* headers or not.
+    ], $this->_normalized_parts([
+      "scheme" => "https",
+      "host" => "real.example.org",
+      "port" => 80,
+      "path" => "/",
+    ])];
+
+    $data["(from server data (HX-SUNP))"] = [[
+      "HTTP_HOST" => "real.example.org",
+      "HTTP_X_FORWARDED_PROTO" => "https",
+      "HTTP_X_FORWARDED_HOST" => "real.example.org",
+      "HTTP_X_FORWARDED_PORT" => 80,
+      "REQUEST_SCHEME" => "http",
+      "REQUEST_URI" => "/",
+      "SERVER_NAME" => "upstream.example.org",
+      "SERVER_PORT" => 8080,
+      "trust" => false, // To trust X-Forwarded-* headers or not.
+    ], $this->_normalized_parts([
+      "scheme" => "http",
+      "host" => "upstream.example.org",
+      "port" => 8080,
+      "path" => "/",
+    ])];
+
+    $data["(from request line (HX-SU+NP))"] = [[
+      "HTTP_HOST" => "real.example.org",
+      "HTTP_X_FORWARDED_PROTO" => "https",
+      "HTTP_X_FORWARDED_HOST" => "real.example.org",
+      "HTTP_X_FORWARDED_PORT" => 80,
+      "REQUEST_SCHEME" => "http",
+      "REQUEST_URI" => "//real.example.org/",
+      "SERVER_NAME" => "upstream.example.org",
+      "SERVER_PORT" => 8080,
+      "trust" => false, // To trust X-Forwarded-* headers or not.
+    ], $this->_normalized_parts([
+      "scheme" => "http",
+      "host" => "real.example.org",
+      "port" => 8080,
+      "path" => "/",
+    ])];
+
+    $data["(from server data / no server name (HX-sUNP))"] = [[
+      "HTTP_HOST" => "real.example.org",
+      "HTTP_X_FORWARDED_PROTO" => "https",
+      "HTTP_X_FORWARDED_HOST" => "real.example.org",
+      "HTTP_X_FORWARDED_PORT" => 80,
+      "REQUEST_SCHEME" => "http",
+      "REQUEST_URI" => "/",
+      "SERVER_NAME" => "",
+      "SERVER_PORT" => 8080,
+      "trust" => false, // To trust X-Forwarded-* headers or not.
+    ], $this->_normalized_parts([
+      "scheme" => "http",
+      "host" => "real.example.org",
+      "port" => 8080,
+      "path" => "/",
+    ])];
+
+    return $data;
+  }
+
+  public function overridePartsProvider()
+  {
+    $parts = [
+      "scheme" => "http",
+      "user" => "user",
+      "pass" => "password",
+      "host" => "localhost",
+      "port" => 80,
+      "path" => "/",
+      "query" => ["x" => "y"],
+      "fragment" => "fragment",
+    ];
+
+    foreach($parts as $name => $value)
+    {
+      $data[$name] = [
+        [$name => $value],
+        $this->_normalized_parts([$name => $value]),
+      ];
+    }
+
+    $data["query(as string)"] = [
+      ["query" => "query=string"],
+      $this->_normalized_parts(["query" => ["query" => "string"]]),
+    ];
+
+    $data["in a batch"] = [
+      [
+        "scheme" => "http",
+        "host" => "localhost",
+        "path" => "/",
+      ],
+      $this->_normalized_parts([
+        "scheme" => "http",
+        "host" => "localhost",
+        "path" => "/",
+      ]),
+    ];
+
+    return $data;
+  }
+
   /** Provide a list of well-known schemes and ports
   */
   public function standardSchemesProvider()
@@ -193,18 +319,74 @@ extends TestCase
     return $data;
   }
 
+  /** Test creation of an empty slate Url from null
+  *
+  * Test if legacy code is affecting the class behavior.
+  */
+  public function testCreateEmptyEntityFromNull()
+  {
+    $_SERVER["SERVER_NAME"] = "localhost";
+    $this->assertTrue($this->_normalized_parts([]) === $this->getParts(new Url));
+  }
+
   /** Test creation of an empty slate Url from empty URI
   *
   */
-  public function testCreateEmptyClassFromEmptyString()
+  public function testCreateEmptyEntityFromEmptyString()
   {
     $this->assertTrue($this->_normalized_parts([]) === $this->getParts(new Url('')));
+  }
+
+  /** Test creation of an Url from URI
+  *
+  */
+  public function testCreateEntityFromUri()
+  {
+    $this->assertTrue($this->_normalized_parts([
+      "host" => "localhost",
+      "path" => "/",
+      "query" => ["x" => "y"],
+    ]) === $this->getParts(new Url($this->sampleUrl())));
+  }
+
+  /** Test creation of an Url with query override
+  *
+  */
+  public function testCreateEntityWithQueryClearing()
+  {
+    $this->assertTrue($this->_normalized_parts([
+      "host" => "localhost",
+      "path" => "/",
+    ]) === $this->getParts(new Url($this->sampleUrl(), [])));
+  }
+
+  /** Test creation of an Url with query override
+  *
+  */
+  public function testCreateEntityWithQueryOverride()
+  {
+    $this->assertTrue($this->_normalized_parts([
+      "host" => "localhost",
+      "path" => "/",
+      "query" => ["z" => "t"],
+    ]) === $this->getParts(new Url($this->sampleUrl(), ["z" => "t"])));
+  }
+
+  /** Test creation of entity from environment
+  *
+  * @dataProvider environmentProvider
+  * @depends testCreateEmptyEntityFromEmptyString
+  */
+  public function testCreateEntityFromEnvironment($env, $parts)
+  {
+    $_SERVER = $env + $_SERVER;
+    $this->assertTrue($parts === $this->getParts(Url::fromHttp([], $_SERVER["trust"])));
   }
 
   /** Test if parsing invalid URL throws exception.
   *
   * @expectedException \InvalidArgumentException
-  * @depends testCreateEmptyClassFromEmptyString
+  * @depends testCreateEmptyEntityFromEmptyString
   */
   public function testParseUrlWithException()
   {
@@ -214,7 +396,7 @@ extends TestCase
   /** Test parsing of obviously valid strings.
   *
   * @dataProvider validListProvider
-  * @depends testCreateEmptyClassFromEmptyString
+  * @depends testCreateEmptyEntityFromEmptyString
   */
   public function testParseValidUrl($url, $parts)
   {
@@ -225,7 +407,7 @@ extends TestCase
   *
   * @see http://php.net/manual/en/language.variables.external.php Variables From External Sources
   * @dataProvider mangledCharsProvider
-  * @depends testCreateEmptyClassFromEmptyString
+  * @depends testCreateEmptyEntityFromEmptyString
   */
   public function testParseQueryString($url, $parts)
   {
@@ -242,6 +424,16 @@ extends TestCase
 
       throw $e;
     }
+  }
+
+  /** Test setting various URL parts
+  *
+  * @dataProvider overridePartsProvider
+  * @depends testCreateEmptyEntityFromEmptyString
+  */
+  public function testSetUrlPart($overrides, $parts)
+  {
+    $this->assertTrue($parts === $this->getParts($this->url->setParts($overrides)));
   }
 
   /** Test scheme-port normalization for well-known protocols

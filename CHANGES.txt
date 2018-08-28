@@ -1,42 +1,43 @@
 ------------------------------------------------------------------------
-r799 | anrdaemon | 2018-04-15 20:07:18 +0300 (Sun, 15 Apr 2018) | 3 lines
+r857 | anrdaemon | 2018-08-28 03:26:18 +0300 (Tue, 28 Aug 2018) | 3 lines
 
-+ Math:GSeq Use common validity check for $n.
-+ Plan for tests.
-
-------------------------------------------------------------------------
-r796 | anrdaemon | 2018-04-08 23:51:15 +0300 (Sun, 08 Apr 2018) | 2 lines
-
-+ GSeq initial (ok, not) implementation.
++ Net\Url - added separate constructor to create Url from environment.
++ Added more test coverage.
 
 ------------------------------------------------------------------------
-r795 | anrdaemon | 2018-04-05 22:12:30 +0300 (Thu, 05 Apr 2018) | 2 lines
+r856 | anrdaemon | 2018-08-28 03:23:50 +0300 (Tue, 28 Aug 2018) | 3 lines
 
-- Reduce the number of "new static" calls to absolutely required.
-
-------------------------------------------------------------------------
-r794 | anrdaemon | 2018-04-05 18:22:37 +0300 (Thu, 05 Apr 2018) | 2 lines
-
-* Optimize zero distance directional movements.
+* Clarified Url::_parse_url error message for incorrect argument.
+* Tightened parameter validation for Url::_parse_str.
 
 ------------------------------------------------------------------------
-r793 | anrdaemon | 2018-04-04 21:58:30 +0300 (Wed, 04 Apr 2018) | 4 lines
+r855 | anrdaemon | 2018-08-27 23:53:37 +0300 (Mon, 27 Aug 2018) | 2 lines
 
-* Unify property access pattern across the class.
-  Only directly access property storage, when you actually mean it.
-  In all other cases, use magic to retrieve value of the property.
+* Fixed UrlTest for PHP5 compatibility.
 
 ------------------------------------------------------------------------
-r792 | anrdaemon | 2018-04-04 19:41:30 +0300 (Wed, 04 Apr 2018) | 2 lines
+r854 | anrdaemon | 2018-08-27 21:06:49 +0300 (Mon, 27 Aug 2018) | 2 lines
 
-+ Refactored Coordinate3D into a generic Point class.
+* Reverted accidental parts ordering break from r852
 
 ------------------------------------------------------------------------
-r791 | anrdaemon | 2018-04-04 02:09:41 +0300 (Wed, 04 Apr 2018) | 5 lines
+r852 | anrdaemon | 2018-08-26 04:03:37 +0300 (Sun, 26 Aug 2018) | 2 lines
 
-* Set the groundwork for further development of Point class.
-* Drop redundant capabilities.
-* Make class immutable.
-* Add degrees variant of fromPolar() constructor.
+* Improve Url::setParts to better handle the case where query string or fragment equals to "0".
+
+------------------------------------------------------------------------
+r851 | anrdaemon | 2018-08-26 03:49:50 +0300 (Sun, 26 Aug 2018) | 2 lines
+
+* Use external iterator. I mean, really. Why reinvent wheels?
+
+------------------------------------------------------------------------
+r806 | anrdaemon | 2018-06-19 17:23:06 +0300 (Tue, 19 Jun 2018) | 2 lines
+
++ Correctly parse "+" in URL path component.
+
+------------------------------------------------------------------------
+r800 | anrdaemon | 2018-04-15 20:21:44 +0300 (Sun, 15 Apr 2018) | 2 lines
+
+= Merge down the Math branch.
 
 ------------------------------------------------------------------------

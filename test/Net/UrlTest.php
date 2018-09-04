@@ -9,7 +9,7 @@ use
 final class UrlTest
 extends TestCase
 {
-  protected $url;
+  protected static $url;
 
   protected function _parse_str($string)
   {
@@ -20,8 +20,9 @@ extends TestCase
     return $query;
   }
 
-  protected function _normalized_parts(array $parts)
+  protected function _normalized(array $parts)
   {
+    static $set;
     static $blank = [
       'scheme' => null, // - e.g. http
       'user' => null, //
@@ -33,8 +34,26 @@ extends TestCase
       'fragment' => null, // - after the hashmark #
     ];
 
+    if(!isset($set))
+    {
+      $url = new Url('');
+      $set = function(array $parts)
+      {
+         $self = clone $this;
+         $self->params = $parts;
+         return $self;
+      };
+      $set = $set->bindTo($url, $url);
+    }
+
     // Keep parts in static order
-    return array_replace($blank, array_intersect_key($parts, $blank));
+    return $set(array_replace($blank, array_intersect_key($parts, $blank)));
+  }
+
+  /** @beforeClass */
+  public static function setUrl()
+  {
+    static::$url = new Url('');
   }
 
   /** Provide a sample valid URI
@@ -49,11 +68,6 @@ extends TestCase
     $test = function() { return $this->params; };
     $test = $test->bindTo($url, $url);
     return $test();
-  }
-
-  public function setUp()
-  {
-    $this->url = new Url('');
   }
 
   /** Provide a list of valid strings with no known parsing caveats
@@ -130,7 +144,7 @@ extends TestCase
       {
         $data += [
           $value => [$value,
-          $this->_normalized_parts([
+          $this->_normalized([
             'scheme' => $scheme, //
             'user' => $user, //
             'pass' => $password, //
@@ -158,7 +172,7 @@ extends TestCase
       $name = "?" . urlencode($char) . "=1";
       $data["'{$name}' ($char)"] = [
         $name,
-        $this->_normalized_parts([
+        $this->_normalized([
           'query' => [$char => '1'],
         ]),
       ];
@@ -181,7 +195,7 @@ extends TestCase
       "SERVER_NAME" => "upstream.example.org",
       "SERVER_PORT" => 8080,
       "trust" => true, // To trust X-Forwarded-* headers or not.
-    ], $this->_normalized_parts([
+    ], $this->_normalized([
       "scheme" => "https",
       "host" => "real.example.org",
       "port" => 80,
@@ -198,7 +212,7 @@ extends TestCase
       "SERVER_NAME" => "upstream.example.org",
       "SERVER_PORT" => 8080,
       "trust" => false, // To trust X-Forwarded-* headers or not.
-    ], $this->_normalized_parts([
+    ], $this->_normalized([
       "scheme" => "http",
       "host" => "upstream.example.org",
       "port" => 8080,
@@ -215,7 +229,7 @@ extends TestCase
       "SERVER_NAME" => "upstream.example.org",
       "SERVER_PORT" => 8080,
       "trust" => false, // To trust X-Forwarded-* headers or not.
-    ], $this->_normalized_parts([
+    ], $this->_normalized([
       "scheme" => "http",
       "host" => "real.example.org",
       "port" => 8080,
@@ -232,7 +246,7 @@ extends TestCase
       "SERVER_NAME" => "",
       "SERVER_PORT" => 8080,
       "trust" => false, // To trust X-Forwarded-* headers or not.
-    ], $this->_normalized_parts([
+    ], $this->_normalized([
       "scheme" => "http",
       "host" => "real.example.org",
       "port" => 8080,
@@ -259,13 +273,13 @@ extends TestCase
     {
       $data[$name] = [
         [$name => $value],
-        $this->_normalized_parts([$name => $value]),
+        $this->_normalized([$name => $value]),
       ];
     }
 
     $data["query(as string)"] = [
       ["query" => "query=string"],
-      $this->_normalized_parts(["query" => ["query" => "string"]]),
+      $this->_normalized(["query" => ["query" => "string"]]),
     ];
 
     $data["in a batch"] = [
@@ -274,7 +288,7 @@ extends TestCase
         "host" => "localhost",
         "path" => "/",
       ],
-      $this->_normalized_parts([
+      $this->_normalized([
         "scheme" => "http",
         "host" => "localhost",
         "path" => "/",
@@ -326,7 +340,7 @@ extends TestCase
   public function testCreateEmptyEntityFromNull()
   {
     $_SERVER["SERVER_NAME"] = "localhost";
-    $this->assertTrue($this->_normalized_parts([]) === $this->getParts(new Url));
+    $this->assertEquals($this->_normalized([]), new Url);
   }
 
   /** Test creation of an empty slate Url from empty URI
@@ -334,7 +348,7 @@ extends TestCase
   */
   public function testCreateEmptyEntityFromEmptyString()
   {
-    $this->assertTrue($this->_normalized_parts([]) === $this->getParts(new Url('')));
+    $this->assertEquals($this->_normalized([]), new Url(''));
   }
 
   /** Test creation of an Url from URI
@@ -342,11 +356,11 @@ extends TestCase
   */
   public function testCreateEntityFromUri()
   {
-    $this->assertTrue($this->_normalized_parts([
+    $this->assertEquals($this->_normalized([
       "host" => "localhost",
       "path" => "/",
       "query" => ["x" => "y"],
-    ]) === $this->getParts(new Url($this->sampleUrl())));
+    ]), new Url($this->sampleUrl()));
   }
 
   /** Test creation of an Url with query override
@@ -354,10 +368,10 @@ extends TestCase
   */
   public function testCreateEntityWithQueryClearing()
   {
-    $this->assertTrue($this->_normalized_parts([
+    $this->assertEquals($this->_normalized([
       "host" => "localhost",
       "path" => "/",
-    ]) === $this->getParts(new Url($this->sampleUrl(), [])));
+    ]), new Url($this->sampleUrl(), []));
   }
 
   /** Test creation of an Url with query override
@@ -365,11 +379,11 @@ extends TestCase
   */
   public function testCreateEntityWithQueryOverride()
   {
-    $this->assertTrue($this->_normalized_parts([
+    $this->assertEquals($this->_normalized([
       "host" => "localhost",
       "path" => "/",
       "query" => ["z" => "t"],
-    ]) === $this->getParts(new Url($this->sampleUrl(), ["z" => "t"])));
+    ]), new Url($this->sampleUrl(), ["z" => "t"]));
   }
 
   /** Test creation of entity from environment
@@ -380,7 +394,7 @@ extends TestCase
   public function testCreateEntityFromEnvironment($env, $parts)
   {
     $_SERVER = $env + $_SERVER;
-    $this->assertTrue($parts === $this->getParts(Url::fromHttp([], $_SERVER["trust"])));
+    $this->assertEquals($parts, Url::fromHttp([], $_SERVER["trust"]));
   }
 
   /** Test if parsing invalid URL throws exception.
@@ -390,7 +404,7 @@ extends TestCase
   */
   public function testParseUrlWithException()
   {
-    $this->url->parse('//:0');
+    static::$url->parse('//:0');
   }
 
   /** Test parsing of obviously valid strings.
@@ -400,7 +414,7 @@ extends TestCase
   */
   public function testParseValidUrl($url, $parts)
   {
-    $this->assertTrue($parts === $this->getParts($this->url->parse($url)));
+    $this->assertEquals($parts, static::$url->parse($url));
   }
 
   /** Test parsing of valid URL's mandgled by PHP's parse_str
@@ -413,11 +427,20 @@ extends TestCase
   {
     try
     {
-      $this->assertTrue($parts === $this->getParts($this->url->parse($url)));
+      $this->assertEquals($parts, static::$url->parse($url));
     }
     catch(\PHPUnit_Framework_ExpectationFailedException $e)
     {
-      $key = array_keys($parts['query']);
+      $key = array_keys($parts->query);
+      $key = reset($key);
+      if(in_array($key, [' ', '.', '[']))
+        return $this->markTestIncomplete('Mangled names of variables from external sources.');
+
+      throw $e;
+    }
+    catch(\PHPUnit\Framework\ExpectationFailedException $e)
+    {
+      $key = array_keys($parts->query);
       $key = reset($key);
       if(in_array($key, [' ', '.', '[']))
         return $this->markTestIncomplete('Mangled names of variables from external sources.');
@@ -433,7 +456,7 @@ extends TestCase
   */
   public function testSetUrlPart($overrides, $parts)
   {
-    $this->assertTrue($parts === $this->getParts($this->url->setParts($overrides)));
+    $this->assertEquals($parts, static::$url->setParts($overrides));
   }
 
   /** Test scheme-port normalization for well-known protocols
@@ -443,6 +466,6 @@ extends TestCase
   */
   public function testOutputWellKnownSchemesNormalized($url, $result)
   {
-    $this->assertTrue($result === (string) $this->url->parse($url));
+    $this->assertTrue($result === (string) static::$url->parse($url));
   }
 }

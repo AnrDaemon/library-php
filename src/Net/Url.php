@@ -1,7 +1,7 @@
 <?php
 /** URL handling class.
 *
-* @version SVN: $Id: Url.php 857 2018-08-28 00:26:18Z anrdaemon $
+* @version SVN: $Id: Url.php 874 2018-08-31 17:02:00Z anrdaemon $
 */
 
 namespace AnrDaemon\Net;
@@ -11,24 +11,27 @@ namespace AnrDaemon\Net;
 * The class is a read-only collection, the only way to modify its contents
 * is to create a new instance of the class.
 *
-* The class is always trying to populate host/port and scheme upon creation,
-* unless an empty URL is provided explicitly. You may override them later on
-* using {@see \AnrDaemon\Net\Url::parse() self::parse()} or {@see \AnrDaemon\Net\Url::setParts() self::setParts()}.
+* URL parts can be accessed as properties (`$url->path`), query parts (beside
+* obvious `$url->query['param']`) can also be accessed as array indices
+* (`$url['param']`) for convenience.
 *
 * When parsing the URI or setting parts, empty values are stripped.
 *
+* In case you want to create a website self-reference URL, the named
+* constructor {@see \AnrDaemon\Net\Url::fromHttp self::fromHttp} is provided.
+*
+* It will try to populate scheme/host/port/path/query parts from information
+* available in $_SERVER array.
+*
 * Warning: PHP compat: PHP ({@see \parse_str parse_str()}) converts certain characters in request variable names.
 * See Note after Example 3 on http://php.net/variables.external#example-88
-*
-* URL parts can be accessed as properties (`$url->path`), query parts
-* can be accessed as array indices (`$url['param']`).
 *
 * @property-read string $scheme Treatment of some well-known schemes (like http or ldap) is enhanced.
 * @property-read string $user
 * @property-read string $pass
 * @property-read string $host The IDN hosts are decoded.
 * @property-read int $port The port is always converted to integer.
-* @property-read string $path Path always decoded, like `$_SERVER['DOCUMENT_URI']`.
+* @property-read string $path Path, always decoded, like in `$_SERVER['DOCUMENT_URI']`.
 * @property-read array $query Part after the question mark "?".
 * @property-read string $fragment Part after the hashmark "#".
 */
@@ -128,7 +131,7 @@ implements \IteratorAggregate, \ArrayAccess, \Countable
   *
   * The order in which environment is processed is as follows:
   *
-  *  1. X-Forwarded-* headers.
+  *  1. X-Forwarded-* headers, if trusted.
   *  2. The entire REQUEST_URI variable as set by SAPI.
   *  3. REQUEST_SCHEME / SERVER_NAME / SERVER_PORT variables from SAPI.
   *  4. The Host header in case host part was not set yet.
@@ -139,10 +142,10 @@ implements \IteratorAggregate, \ArrayAccess, \Countable
   *  - X-Forwarded-Port - original receiving port;
   *  - X-Forwarded-Host - host (and possible port, if not set by X-Forwarded-Port) the original request received for.
   *
-  * It is stronly recommended to configure calling webserver to override X-Forwarded-* headers an application
+  * Warning: It is stronly recommended to configure calling webserver to override X-Forwarded-* headers an application
   * should not trust.
   *
-  * Application should receive an already sanitized environment it could rely upon.
+  * Warning: Application should receive an already sanitized environment it could rely upon.
   *
   * @param array $override An array of parts to override. {@see \AnrDaemon\Net\Url::setParts() self::setParts()}
   * @param bool $trust_x_forwarded_headers To trust the X-Forwarded-{Host,Port,Proto,etc.} headers or not.

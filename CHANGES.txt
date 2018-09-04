@@ -1,43 +1,61 @@
 ------------------------------------------------------------------------
-r857 | anrdaemon | 2018-08-28 03:26:18 +0300 (Tue, 28 Aug 2018) | 3 lines
+r900 | anrdaemon | 2018-09-04 19:03:27 +0300 (Tue, 04 Sep 2018) | 3 lines
 
-+ Net\Url - added separate constructor to create Url from environment.
-+ Added more test coverage.
-
-------------------------------------------------------------------------
-r856 | anrdaemon | 2018-08-28 03:23:50 +0300 (Tue, 28 Aug 2018) | 3 lines
-
-* Clarified Url::_parse_url error message for incorrect argument.
-* Tightened parameter validation for Url::_parse_str.
+* Net\Browser: Improved docblocks for method callers.
+= Sync'd .todo.
 
 ------------------------------------------------------------------------
-r855 | anrdaemon | 2018-08-27 23:53:37 +0300 (Mon, 27 Aug 2018) | 2 lines
+r880 | anrdaemon | 2018-09-01 06:56:56 +0300 (Sat, 01 Sep 2018) | 2 lines
 
-* Fixed UrlTest for PHP5 compatibility.
-
-------------------------------------------------------------------------
-r854 | anrdaemon | 2018-08-27 21:06:49 +0300 (Mon, 27 Aug 2018) | 2 lines
-
-* Reverted accidental parts ordering break from r852
++ Net\Browser: Added __clone and __destruct handlers.
 
 ------------------------------------------------------------------------
-r852 | anrdaemon | 2018-08-26 04:03:37 +0300 (Sun, 26 Aug 2018) | 2 lines
+r879 | anrdaemon | 2018-09-01 06:35:50 +0300 (Sat, 01 Sep 2018) | 2 lines
 
-* Improve Url::setParts to better handle the case where query string or fragment equals to "0".
-
-------------------------------------------------------------------------
-r851 | anrdaemon | 2018-08-26 03:49:50 +0300 (Sun, 26 Aug 2018) | 2 lines
-
-* Use external iterator. I mean, really. Why reinvent wheels?
++ HTTP PUT and custom request method implementations.
 
 ------------------------------------------------------------------------
-r806 | anrdaemon | 2018-06-19 17:23:06 +0300 (Tue, 19 Jun 2018) | 2 lines
+r878 | anrdaemon | 2018-09-01 06:07:17 +0300 (Sat, 01 Sep 2018) | 2 lines
 
-+ Correctly parse "+" in URL path component.
+* Moved common request steps into a helper method.
 
 ------------------------------------------------------------------------
-r800 | anrdaemon | 2018-04-15 20:21:44 +0300 (Sun, 15 Apr 2018) | 2 lines
+r877 | anrdaemon | 2018-09-01 05:52:07 +0300 (Sat, 01 Sep 2018) | 3 lines
 
-= Merge down the Math branch.
+* Fixed Net\Browser::setOpt to behave and report.
++ Added CurlOptions helper to better report errors.
+
+------------------------------------------------------------------------
+r876 | anrdaemon | 2018-09-01 01:27:16 +0300 (Sat, 01 Sep 2018) | 2 lines
+
++ Implement ability to return basic request status as a single array.
+
+------------------------------------------------------------------------
+r875 | anrdaemon | 2018-09-01 01:23:26 +0300 (Sat, 01 Sep 2018) | 4 lines
+
++ Added a (b)lo(a)t of docblocks to Net\Browser.
+* Prepared put and custom requests for existence.
+  Sad but I can't make it any better than that.
+
+------------------------------------------------------------------------
+r874 | anrdaemon | 2018-08-31 20:02:00 +0300 (Fri, 31 Aug 2018) | 2 lines
+
+* Repaired initial docblock, removing legacy behavior references.
+
+------------------------------------------------------------------------
+r873 | anrdaemon | 2018-08-31 18:44:46 +0300 (Fri, 31 Aug 2018) | 2 lines
+
+* Used assertEquals where applicable for better failure representation.
+
+------------------------------------------------------------------------
+r872 | anrdaemon | 2018-08-31 18:42:04 +0300 (Fri, 31 Aug 2018) | 3 lines
+
+* Reordered methods.
+* Added PHPUnit v7 compatible exception trap.
+
+------------------------------------------------------------------------
+r871 | anrdaemon | 2018-08-31 16:20:04 +0300 (Fri, 31 Aug 2018) | 2 lines
+
+* Use static $url in tests.
 
 ------------------------------------------------------------------------

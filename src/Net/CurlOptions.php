@@ -52,9 +52,9 @@ class CurlOptions
         'CURLOPT_SSLKEYPASSWD' => 'CURLOPT_KEYPASSWD',
         'CURLOPT_SSLCERTPASSWD' => 'CURLOPT_KEYPASSWD',
         'CURLOPT_KRBLEVEL' => 'CURLOPT_KRB4LEVEL',
-      ] as $key => $value)
+      ] as $dupe => $real)
       {
-        if(isset($arr[$value])) unset($arr[$key]);
+        if(isset($arr[$real])) unset($arr[$dupe]);
       }
 
       foreach($arr as $key => $value)
@@ -77,6 +77,5 @@ class CurlOptions
     }
   }
 }
-
 
 return new CurlOptions;

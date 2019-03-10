@@ -182,6 +182,15 @@ extends TestCase
   }
 
   /** Provide _SERVER overrides for Url::fromHttp() method.
+  *
+  * Flags in test names (capital - present _SERVER keys, small - absent):
+  *   H - HTTP_HOST
+  *   X - X-Forwarded-*
+  *   +/- to trust X-Forwarded headers or not
+  *   S - REQUEST_SCHEME
+  *   U - REQUEST_URI (+ - contains extra information, like f.e. server name)
+  *   N - SERVER_NAME
+  *   P - SERVER_PORT
   */
   public function environmentProvider()
   {

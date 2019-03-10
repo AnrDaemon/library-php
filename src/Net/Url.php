@@ -1,7 +1,7 @@
 <?php
 /** URL handling class.
 *
-* @version SVN: $Id: Url.php 874 2018-08-31 17:02:00Z anrdaemon $
+* @version SVN: $Id: Url.php 909 2018-10-17 13:21:08Z anrdaemon $
 */
 
 namespace AnrDaemon\Net;
@@ -351,7 +351,7 @@ implements \IteratorAggregate, \ArrayAccess, \Countable
     return isset($this->params[$index]);
   }
 
-  /** Converts URL to a sting representation.
+  /** Converts URL to a string representation.
   *
   * If URI scheme is specified, some well-known schemes are considered
   * and default port number is omitted from the resulting URI.

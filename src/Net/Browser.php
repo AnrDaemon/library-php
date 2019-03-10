@@ -1,7 +1,7 @@
 <?php
 /** Simplistic curl wrapper with runtime cookie persistence
 *
-* @version SVN: $Id: Browser.php 900 2018-09-04 16:03:27Z anrdaemon $
+* @version SVN: $Id: Browser.php 981 2018-12-29 22:09:17Z anrdaemon $
 */
 
 namespace AnrDaemon\Net;
@@ -162,30 +162,34 @@ class Browser
 
 // Method handling
 
-  /** HTTP GET method caller
+  /** HTTP GET-like method caller
   *
-  * Performs HTTP GET request on a given `$url`.
+  * Performs a body-less HTTP request on a given `$url`.
   *
   * Returns response body, if applicable.
+  *
+  * The request may not contain a body part.
   *
   * Upon successful(*) request, the basic status block is populated.
   *
   * (*)The definition of success depends on cURL handle settings.
   *
-  * @param string $url An URL to access
+  * @param string $url An URL to access.
+  * @param ?string $method The request method, defaults to GET.
   * @return string Response body.
   */
-  public function get($url)
+  public function get($url, $method = "GET")
   {
     return $this->request([
       CURLOPT_HTTPGET => true,
+      CURLOPT_CUSTOMREQUEST => $method ?: "GET",
       CURLOPT_URL => "$url",
     ]);
   }
 
-  /** HTTP POST method caller
+  /** HTTP POST-like method caller
   *
-  * Performs HTTP POST request on a given `$url`.
+  * Performs HTTP request on a given `$url`.
   *
   * Returns response body, if applicable.
   *
@@ -196,22 +200,24 @@ class Browser
   *
   * (*)The definition of success depends on cURL handle settings.
   *
-  * @param string $url An URL to access
+  * @param string $url An URL to access.
   * @param mixed $data The POST data in CURLOPT_POSTFIELDS-appropriate format.
+  * @param ?string $method The request method, defaults to POST.
   * @return string Response body.
   */
-  public function post($url, $data = null)
+  public function post($url, $data = null, $method = "POST")
   {
     return $this->request([
       CURLOPT_POST => true,
+      CURLOPT_CUSTOMREQUEST => $method ?: "POST",
       CURLOPT_URL => "$url",
       CURLOPT_POSTFIELDS => $data ?: '',
     ]);
   }
 
-  /** HTTP PUT method caller
+  /** HTTP PUT-like method caller
   *
-  * Performs HTTP PUT request on a given `$url`.
+  * Performs HTTP request on a given `$url`.
   *
   * Returns response body, if applicable.
   *
@@ -224,46 +230,14 @@ class Browser
   * @param string $url An URL to access.
   * @param resource $data The stream resource to read data from.
   * @param int $len Length of `$data` to read.
+  * @param ?string $method The request method, defaults to PUT.
   * @return string Response body.
   */
-  public function put($url, $data = null, $len = null)
+  public function put($url, $data = null, $len = null, $method = "PUT")
   {
     return $this->request([
       CURLOPT_PUT => true,
-      CURLOPT_URL => "$url",
-      CURLOPT_INFILE => $data,
-      CURLOPT_INFILESIZE => $len,
-    ]);
-  }
-
-  /** Custom HTTP method caller
-  *
-  * Performs a HTTP `$method` request on a given `$url`.
-  *
-  * Returns response body, if applicable.
-  *
-  * The request body is read from stream resource `$data` for `$len` bytes of content.
-  *
-  * The logic is quite simple: Switching request mode to CURLOPT_PUT enables raw body
-  * reception, then you can do anything you wish with any method you could imagine.
-  *
-  * This is, for example, useful to perform POST requests with raw application/json content.
-  *
-  * Upon successful(*) request, the basic status block is populated.
-  *
-  * (*)The definition of success depends on cURL handle settings.
-  *
-  * @param string $method The name (verb) of the method to perform. Like "GET" or "DELETE".
-  * @param string $url An URL to access.
-  * @param resource $data The stream resource to read data from.
-  * @param int $len Length of `$data` to read.
-  * @return string Response body.
-  */
-  public function customRequest($method, $url, $data = null, $len = null)
-  {
-    return $this->request([
-      CURLOPT_PUT => true,
-      CURLOPT_CUSTOMREQUEST => (string)$method,
+      CURLOPT_CUSTOMREQUEST => $method ?: "PUT",
       CURLOPT_URL => "$url",
       CURLOPT_INFILE => $data,
       CURLOPT_INFILESIZE => $len,

@@ -1,61 +1,20 @@
-Per file changelog from 905 to 1001
+Per file changelog from 997 to 1001
 
-src/classloader.php
+src/Utility/Template.php
 ------------------------------------------------------------------------
-r1001 | anrdaemon | 2019-03-10 23:40:08 +0300 (Sun, 10 Mar 2019) | 3 lines
+r999 | anrdaemon | 2019-03-10 00:11:29 +0300 (Sun, 10 Mar 2019) | 3 lines
 
-* Simplified classloader.
-  Again!
-
-------------------------------------------------------------------------
-r935 | anrdaemon | 2018-11-24 22:37:09 +0300 (Sat, 24 Nov 2018) | 2 lines
-
-* Tweaked classloader code style.
+* Improve coding style.
++ Improve Smarty compatibility.
 
 ------------------------------------------------------------------------
-r932 | anrdaemon | 2018-11-24 21:20:26 +0300 (Sat, 24 Nov 2018) | 2 lines
+r998 | anrdaemon | 2019-03-09 07:01:03 +0300 (Sat, 09 Mar 2019) | 2 lines
 
-* Altered universal classloader slightly to get rid of expensive calls.
-
-------------------------------------------------------------------------
-
-src/Net/CurlOptions.php
-------------------------------------------------------------------------
-r1000 | anrdaemon | 2019-03-10 22:43:14 +0300 (Sun, 10 Mar 2019) | 2 lines
-
-* Better variables naming.
++ More compatibility improvements.
 
 ------------------------------------------------------------------------
+r997 | anrdaemon | 2019-03-09 06:50:55 +0300 (Sat, 09 Mar 2019) | 2 lines
 
-src/Net/Browser.php
-------------------------------------------------------------------------
-r981 | anrdaemon | 2018-12-30 01:09:17 +0300 (Sun, 30 Dec 2018) | 3 lines
-
-* Reworked Net\Browser::get|post|put methods into request types.
-- Removed Net\Browser::customRequest as unusable and unnecessary overhead.
-
-------------------------------------------------------------------------
-
-src/Net/Url.php
-------------------------------------------------------------------------
-r909 | anrdaemon | 2018-10-17 16:21:08 +0300 (Wed, 17 Oct 2018) | 2 lines
-
-* Fixed minor typo in the docblock comment.
-
-------------------------------------------------------------------------
-
-src/Exceptions/CurlException.php
-------------------------------------------------------------------------
-r993 | anrdaemon | 2019-03-04 21:12:58 +0300 (Mon, 04 Mar 2019) | 2 lines
-
-* Fixed curl_error/curl_strerror usage in CurlException.
-
-------------------------------------------------------------------------
-
-test/Net/UrlTest.php
-------------------------------------------------------------------------
-r991 | anrdaemon | 2019-02-26 22:36:13 +0300 (Tue, 26 Feb 2019) | 2 lines
-
-+ Improved documentation for Net\Url tests.
++ Initial commit of simple PHP template implementation.
 
 ------------------------------------------------------------------------

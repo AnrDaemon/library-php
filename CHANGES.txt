@@ -1,20 +1,10 @@
-Per file changelog from 997 to 1001
+Per file changelog from 1002 to 1014
 
-src/Utility/Template.php
+src/Net/Browser.php
 ------------------------------------------------------------------------
-r999 | anrdaemon | 2019-03-10 00:11:29 +0300 (Sun, 10 Mar 2019) | 3 lines
+r1014 | anrdaemon | 2019-05-23 01:32:50 +0300 (Thu, 23 May 2019) | 3 lines
 
-* Improve coding style.
-+ Improve Smarty compatibility.
-
-------------------------------------------------------------------------
-r998 | anrdaemon | 2019-03-09 07:01:03 +0300 (Sat, 09 Mar 2019) | 2 lines
-
-+ More compatibility improvements.
-
-------------------------------------------------------------------------
-r997 | anrdaemon | 2019-03-09 06:50:55 +0300 (Sat, 09 Mar 2019) | 2 lines
-
-+ Initial commit of simple PHP template implementation.
+- Fixed typo in docblock.
+  Thanks @konrados!
 
 ------------------------------------------------------------------------

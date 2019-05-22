@@ -1,7 +1,7 @@
 <?php
 /** Simplistic curl wrapper with runtime cookie persistence
 *
-* @version SVN: $Id: Browser.php 981 2018-12-29 22:09:17Z anrdaemon $
+* @version SVN: $Id: Browser.php 1014 2019-05-22 22:32:50Z anrdaemon $
 */
 
 namespace AnrDaemon\Net;
@@ -57,7 +57,7 @@ class Browser
 
   /** The curl wrapper itself.
   *
-  * Perfroms an actual call to the cURL library and judges the result.
+  * Performs an actual call to the cURL library and judges the result.
   *
   * An exception is thrown if results are found inadequate.
   *

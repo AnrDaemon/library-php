@@ -1,10 +1,6 @@
-Per file changelog from 1002 to 1014
-
-src/Net/Browser.php
 ------------------------------------------------------------------------
-r1014 | anrdaemon | 2019-05-23 01:32:50 +0300 (Thu, 23 May 2019) | 3 lines
+r1023 | anrdaemon | 2019-08-16 17:23:14 +0300 (Fri, 16 Aug 2019) | 2 lines
 
-- Fixed typo in docblock.
-  Thanks @konrados!
+- Fixed setting cURL PKI with empty values from openssl ext.
 
 ------------------------------------------------------------------------

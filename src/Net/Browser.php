@@ -1,7 +1,7 @@
 <?php
 /** Simplistic curl wrapper with runtime cookie persistence
 *
-* @version SVN: $Id: Browser.php 1014 2019-05-22 22:32:50Z anrdaemon $
+* @version SVN: $Id: Browser.php 1023 2019-08-16 14:23:14Z anrdaemon $
 */
 
 namespace AnrDaemon\Net;
@@ -253,13 +253,15 @@ class Browser
       throw new CurlException;
 
     $this->curl = $result;
-    $this->setOpt((array)$params + [
+    $pki = [
+      CURLOPT_CAINFO => ini_get('openssl.cafile'),
+      CURLOPT_CAPATH => ini_get('openssl.capath'),
+    ];
+    $this->setOpt((array)$params + array_filter($pki) + [
       CURLOPT_COOKIEFILE => '',
       CURLOPT_COOKIESESSION => true,
       CURLOPT_SAFE_UPLOAD => true,
       CURLOPT_RETURNTRANSFER => true,
-      CURLOPT_CAINFO => ini_get('openssl.cafile'),
-      CURLOPT_CAPATH => ini_get('openssl.capath'),
     ]);
   }
 
